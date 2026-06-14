@@ -10,6 +10,7 @@ import DashboardHome from "./DashboardHome";
 import SubjectsPage from "./SubjectsPage";
 import PlannerPage from "./PlannerPage";
 import ProgressPage from "./ProgressPage";
+
 function Dashboard() {
   const [activePage, setActivePage] =
   useState("dashboard");
@@ -273,8 +274,10 @@ ${
 
   {activePage === "progress" && (
     <ProgressPage />
-  )}
-</div>
+  )}    
+              
+</div>  
+          
     </div>  
 );
 }

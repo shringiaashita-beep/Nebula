@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import supabase from "../lib/supabase";
-
+import { generateFlashcards } from "../lib/gemini";
 function Flashcards({
   subject,
   topic,
@@ -19,27 +19,57 @@ function Flashcards({
   }, []);
 
   const fetchCards = async () => {
-    const { data, error } =
-      await supabase
-        .from("flashcards")
-        .select("*")
-        .eq(
-          "subject_name",
-          subject
-        )
-        .eq(
-          "topic_name",
-          topic
-        );
+  const { data, error } =
+    await supabase
+      .from("flashcards")
+      .select("*")
+      .eq(
+        "subject_name",
+        subject
+      )
+      .eq(
+        "topic_name",
+        topic
+      );
 
-    if (error) {
-      console.log(error);
-      return;
-    }
+  if (
+    !error &&
+    data &&
+    data.length > 0
+  ) {
+    setCards(data);
+    return;
+  }
 
-    setCards(data || []);
-  };
+  try {
+    const aiCards =
+      await generateFlashcards(
+        subject,
+        topic
+      );
 
+    const rows = aiCards.map(
+      (card) => ({
+        subject_name:
+          subject,
+        topic_name:
+          topic,
+        question:
+          card.question,
+        answer:
+          card.answer,
+      })
+    );
+
+    await supabase
+      .from("flashcards")
+      .insert(rows);
+
+    setCards(rows);
+  } catch (err) {
+    console.log(err);
+  }
+};
   if (cards.length === 0) {
     return (
       <div className="mt-4">

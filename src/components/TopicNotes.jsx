@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { jsPDF } from "jspdf";
 import supabase from "../lib/supabase";
-import { generateNotes } from "../lib/gemini";
+import {
+  generateNotes,
+  askTutor,
+} from "../lib/gemini";
 
 function TopicNotes({
   subject,
@@ -14,6 +17,14 @@ function TopicNotes({
     useState(true);
   const [generated, setGenerated] =
     useState(false);
+    const [question, setQuestion] =
+  useState("");
+
+const [answer, setAnswer] =
+  useState("");
+
+const [asking, setAsking] =
+  useState(false);
   const [aiError, setAiError] =
     useState(null);
 
@@ -95,6 +106,30 @@ function TopicNotes({
     setGenerated(true);
     await generateAndStoreNotes();
   };
+  const handleAskAI =
+  async () => {
+    if (!question.trim()) return;
+
+    try {
+      setAsking(true);
+
+      const response =
+        await askTutor(
+          subject,
+          topic,
+          question
+        );
+
+      setAnswer(response);
+    } catch (error) {
+      alert(
+        error.message ||
+          "Failed to get answer."
+      );
+    } finally {
+      setAsking(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -167,6 +202,52 @@ function TopicNotes({
       <pre className="whitespace-pre-wrap">
         {notes}
       </pre>
+      <div className="mt-8 border-t pt-6">
+  <h3 className="text-xl font-bold mb-3">
+    🤖 Ask AI Tutor
+  </h3>
+  <textarea
+  value={question}
+  onChange={(e) =>
+    setQuestion(
+      e.target.value
+    )
+  }
+  onKeyDown={(e) => {
+    if (
+      e.key === "Enter" &&
+      !e.shiftKey
+    ) {
+      e.preventDefault();
+      handleAskAI();
+    }
+  }}
+  placeholder="Ask anything in any language..."
+  className="w-full border p-3 rounded-xl"
+  rows={3}
+/>
+  <button
+    onClick={handleAskAI}
+    disabled={asking}
+    className="mt-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-2 rounded-xl"
+  >
+    {asking
+      ? "Thinking..."
+      : "Ask AI"}
+  </button>
+
+  {answer && (
+    <div className="mt-4 bg-slate-100 p-4 rounded-xl">
+      <h4 className="font-semibold mb-2">
+        AI Answer
+      </h4>
+
+      <div className="whitespace-pre-wrap">
+        {answer}
+      </div>
+    </div>
+  )}
+</div>
     </div>
   );
 }

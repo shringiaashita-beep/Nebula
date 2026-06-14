@@ -12,9 +12,12 @@ import {
 import {
   generateEliteChallenge,
 } from "../lib/gemini";
+import QuickRevision from "./QuickRevision";
 function TopicsSection({
   selectedSubject,
 }) {
+  const button3D =
+  "relative overflow-hidden rounded-2xl px-5 py-3 font-semibold text-white transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 active:translate-y-0 shadow-[0_8px_0_rgba(0,0,0,0.25),0_15px_25px_rgba(0,0,0,0.18)]";
   console.log(
   "SELECTED SUBJECT:",
   selectedSubject
@@ -41,6 +44,8 @@ const [notesTopic, setNotesTopic] =
 const [flashcardTopic, setFlashcardTopic] =
   useState(null);
   const [mindMapTopic, setMindMapTopic] =
+  useState(null);
+  const [revisionTopic, setRevisionTopic] =
   useState(null);
 useEffect(() => {
   fetchTopics();
@@ -557,22 +562,23 @@ Topic Academy </h2>
     />
 
     <button
-      onClick={addTopic}
-      className="bg-black text-white rounded-lg px-4 py-2"
-    >
-      Add Topic
+  onClick={addTopic}
+  className={`${button3D} bg-gradient-to-b from-slate-700 to-black`}
+>
+  ✨ Add Topic
     </button>
     <button
   onClick={
     generateAITopics
   }
-  className="bg-purple-600 text-white rounded-lg px-4 py-2"
+  className={`${button3D} bg-gradient-to-b from-indigo-600 to-indigo-800`}
+  disabled={bulkGenerating}
 >
   Generate AI Topics
 </button>
   <button
     onClick={generateNotesForAllTopics}
-    className="bg-indigo-600 text-white rounded-lg px-4 py-2"
+    className={`${button3D} bg-gradient-to-b from-indigo-600 to-indigo-800`}
     disabled={bulkGenerating}
   >
     {bulkGenerating
@@ -585,7 +591,7 @@ Topic Academy </h2>
     
   <div
     key={topic.id}
-    className="border p-4 rounded-lg mb-2"
+   className="bg-white/80 backdrop-blur-lg border border-slate-200 p-6 rounded-3xl mb-4 shadow-xl hover:shadow-2xl transition-all duration-300"
   >
     <div className="flex justify-between items-center">
       <div>
@@ -612,12 +618,12 @@ Topic Academy </h2>
         </p>
       </div>
 
-    <div className="flex gap-2">
+    <div className="flex flex-wrap gap-3 mt-3">
     <button
     onClick={() =>
       deleteTopic(topic.id)
     }
-    className="bg-red-600 text-white px-3 py-1 rounded"
+   className={`${button3D} bg-gradient-to-b from-red-400 to-red-700 text-sm`}
   >
     Delete
   </button>
@@ -625,7 +631,7 @@ Topic Academy </h2>
     onClick={() =>
       setNotesTopic(topic)
     }
-    className="bg-yellow-500 text-white px-3 py-1 rounded"
+    className={`${button3D} bg-gradient-to-b from-yellow-300 to-amber-600 text-sm`}
   >
     View Notes
   </button>
@@ -634,7 +640,7 @@ Topic Academy </h2>
     onClick={() =>
       setFlashcardTopic(topic)
     }
-    className="bg-purple-600 text-white px-3 py-1 rounded"
+    className={`${button3D} bg-gradient-to-b from-purple-400 to-purple-700 text-sm`}
   >
     Flashcards
   </button>
@@ -642,15 +648,23 @@ Topic Academy </h2>
   onClick={() =>
     setMindMapTopic(topic)
   }
-  className="bg-green-600 text-white px-3 py-1 rounded"
+  className={`${button3D} bg-gradient-to-b from-green-400 to-green-700 text-sm`}
 >
   Mind Map
+</button>
+<button
+  onClick={() =>
+    setRevisionTopic(topic)
+  }
+  className={`${button3D} bg-gradient-to-b from-cyan-400 to-cyan-700 text-sm`}
+>
+  ⚡ Quick Revision
 </button>
   <button
     onClick={() =>
       generateHardQuestionsForTopic(topic)
     }
-    className="bg-pink-600 text-white px-3 py-1 rounded"
+    className={`${button3D} bg-gradient-to-b from-pink-400 to-pink-700 text-sm`}
     disabled={
       questionGeneratingTopicId === topic.id
     }
@@ -665,12 +679,12 @@ Topic Academy </h2>
       onClick={() =>
         setSelectedTopic(topic)
       }
-      className="bg-blue-600 text-white px-3 py-1 rounded"
+      className={`${button3D} bg-gradient-to-b from-blue-400 to-blue-700 text-sm`}
     >
       Take Challenge
     </button>
   ) : (
-    <span className="bg-green-600 text-white px-3 py-1 rounded">
+    <span className="bg-gradient-to-b from-emerald-400 to-emerald-700 text-white px-4 py-2 rounded-xl shadow-lg font-semibold">
       Completed
     </span>
   )}
@@ -696,8 +710,15 @@ Topic Academy </h2>
     topic={topic.topic_name}
   />
 )}
+{revisionTopic?.id === topic.id && (
+  <QuickRevision
+    subject={topic.subject_name}
+    topic={topic.topic_name}
+  />
+)}
   </div>
 ))}
+
 
   {selectedTopic && (
    <EliteChallenge

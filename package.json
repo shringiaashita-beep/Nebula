@@ -19,6 +19,7 @@
     "jsonwebtoken": "^9.0.3",
     "jspdf": "^2.5.2",
     "mongoose": "^9.6.3",
+    "pdfjs-dist": "^6.0.227",
     "react": "^19.2.6",
     "react-calendar": "^6.0.1",
     "react-dom": "^19.2.6",

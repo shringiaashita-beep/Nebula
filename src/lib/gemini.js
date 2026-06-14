@@ -25,23 +25,53 @@ const parseGeminiError = (error) => {
 
 const parseJsonResponse = (text) => {
   try {
-    return JSON.parse(text);
-  } catch {
-    const start = text.indexOf("[");
-    const end = text.lastIndexOf("]");
+    const cleaned = text
+      .replace(/```json/gi, "")
+      .replace(/```/g, "")
+      .trim();
 
-    if (
-      start !== -1 &&
-      end !== -1 &&
-      end > start
-    ) {
-      return JSON.parse(
-        text.slice(start, end + 1)
+    return JSON.parse(cleaned);
+  } catch (firstError) {
+    try {
+      let cleaned = text
+        .replace(/```json/gi, "")
+        .replace(/```/g, "")
+        .trim();
+
+      const start = cleaned.indexOf("[");
+      const end = cleaned.lastIndexOf("]");
+
+      if (
+        start !== -1 &&
+        end !== -1 &&
+        end > start
+      ) {
+        let jsonText = cleaned.slice(
+          start,
+          end + 1
+        );
+
+        jsonText = jsonText.replace(
+          /\\(?!["\\/bfnrtu])/g,
+          "\\\\"
+        );
+
+        return JSON.parse(jsonText);
+      }
+    } catch (secondError) {
+      console.error(
+        "JSON Parse Error:",
+        secondError
       );
     }
 
+    console.error(
+      "Original Gemini Response:",
+      text
+    );
+
     throw new Error(
-      "Unable to parse AI response."
+      "AI returned invalid JSON. Please try again."
     );
   }
 };
@@ -141,17 +171,26 @@ Generate ${count} hardest multiple-choice questions.
 Subject: ${subject}
 Topic: ${topic}
 
-Return only valid JSON:
+IMPORTANT RULES:
+
+Return ONLY raw JSON.
+
+Do NOT write explanations.
+Do NOT write markdown.
+Do NOT wrap output inside \`\`\`json.
+Do NOT write any text before or after JSON.
+
+Format:
 
 [
- {
-   "question":"",
-   "option_a":"",
-   "option_b":"",
-   "option_c":"",
-   "option_d":"",
-   "correct_answer":""
- }
+  {
+    "question":"",
+    "option_a":"",
+    "option_b":"",
+    "option_c":"",
+    "option_d":"",
+    "correct_answer":""
+  }
 ]
 `;
 
@@ -161,10 +200,153 @@ Return only valid JSON:
         prompt
       );
 
+    const responseText =
+      result.response.text();
+
+    console.log(
+      "Gemini Questions Response:",
+      responseText
+    );
+
     return parseJsonResponse(
-      result.response.text()
+      responseText
     );
   } catch (error) {
     throw parseGeminiError(error);
   }
+};
+export const generateRevisionPack =
+  async (subject, topic) => {
+    const prompt = `
+Create a quick revision pack.
+
+Subject: ${subject}
+Topic: ${topic}
+
+Return ONLY valid JSON.
+
+{
+  "summary":"",
+  "flashcards":[
+    {
+      "question":"",
+      "answer":""
+    }
+  ],
+  "mindmap":{
+    "main_topic":"",
+    "branches":[
+      {
+        "title":"",
+        "points":[]
+      }
+    ]
+  }
+}
+`;
+
+    try {
+      const result =
+        await model.generateContent(
+          prompt
+        );
+
+      return parseJsonResponse(
+        result.response.text()
+      );
+    } catch (error) {
+      throw parseGeminiError(error);
+    }
+  };
+  export const generateFlashcards =
+  async (subject, topic) => {
+    const prompt = `
+Create 10 flashcards.
+
+Subject: ${subject}
+Topic: ${topic}
+
+Return ONLY valid JSON.
+
+[
+  {
+    "question":"",
+    "answer":""
+  }
+]
+`;
+
+    try {
+      const result =
+        await model.generateContent(
+          prompt
+        );
+
+      return parseJsonResponse(
+        result.response.text()
+      );
+    } catch (error) {
+      throw parseGeminiError(error);
+    }
+  };
+  export const generateMindMap =
+  async (subject, topic) => {
+    const prompt = `
+Create a study mind map.
+
+Subject: ${subject}
+Topic: ${topic}
+
+Return ONLY valid JSON.
+
+{
+  "main_topic":"",
+  "branches":[
+    {
+      "title":"",
+      "points":[]
+    }
+  ]
+}
+`;
+
+    try {
+      const result =
+        await model.generateContent(
+          prompt
+        );
+
+      return parseJsonResponse(
+        result.response.text()
+      );
+    } catch (error) {
+      throw parseGeminiError(error);
+    }
+  };
+  export const askTutor = async (
+  subject,
+  topic,
+  question
+) => {
+  const prompt = `
+You are an expert tutor.
+
+Subject: ${subject}
+Topic: ${topic}
+
+Student Question:
+${question}
+
+Answer in the same language
+used by the student.
+
+Be clear and educational.
+`;
+
+  const result =
+    await model.generateContent(
+      prompt
+    );
+
+  return result.response.text();
 };

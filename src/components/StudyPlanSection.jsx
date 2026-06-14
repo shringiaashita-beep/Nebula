@@ -251,6 +251,10 @@ function StudyPlanSection() {
             savedPlans.length) *
             100
         );
+        const todayMission =
+  studyPlan.length > 0
+    ? studyPlan[0]
+    : null;
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow mt-8">
@@ -273,28 +277,92 @@ function StudyPlanSection() {
       <div className="flex gap-2 mb-6">
         <button
           onClick={generatePlan}
-          className="bg-black text-white px-6 py-3 rounded-lg"
-        >
+         className="
+bg-gradient-to-r
+from-violet-600
+to-purple-600
+text-white
+px-8
+py-3
+rounded-xl
+shadow-lg
+hover:scale-105
+transition-all
+"                                                                                          
+        > 
           Generate Plan
         </button>
 
         <button
           onClick={savePlan}
-          className="bg-green-600 text-white px-6 py-3 rounded-lg"
+          className="
+bg-gradient-to-r
+from-green-500
+to-emerald-600
+text-white
+px-8
+py-3
+rounded-xl
+shadow-lg
+hover:scale-105
+transition-all
+"
         >
           Save Plan
         </button>
       </div>
+      {todayMission && (
+  <div className="bg-gradient-to-r from-violet-500 to-purple-600 text-white p-6 rounded-2xl shadow-xl mb-6">
+    <h3 className="text-2xl font-bold mb-3">
+      🎯 Today's Mission
+    </h3>
 
-      <div className="bg-slate-100 p-4 rounded-xl mb-6">
-        <h3 className="font-bold">
-          Progress: {progress}%
-        </h3>
+    <div className="space-y-2">
+      <p>
+        📚 Subject:
+        {" "}
+        {todayMission.subject}
+      </p>
 
-        <p>
-          Completed: {completedCount}/
-          {savedPlans.length}
-        </p>
+      <p>
+        ⏳ Study:
+        {" "}
+        {todayMission.studyHours}
+        h today
+      </p>
+
+      <p>
+        🔥 Priority:
+        {" "}
+        {todayMission.priority}
+      </p>
+
+      <p>
+        🚀 Reward:
+        +50 XP
+      </p>
+    </div>
+  </div>
+)}
+
+      <div className="border-l-8 border-blue-500 bg-blue-50 p-4 rounded-xl mb-3 shadow">
+        <h3 className="font-bold mb-2">
+  Progress: {progress}%
+</h3>
+
+<div className="w-full bg-slate-200 rounded-full h-4 mb-3">
+  <div
+    className="h-4 rounded-full bg-green-500 transition-all duration-500"
+    style={{
+      width: `${progress}%`,
+    }}
+  />
+</div>
+
+<p>
+  ✅ Completed: {completedCount}/
+  {savedPlans.length}
+</p>
       </div>
 
       {studyPlan.length > 0 && (
@@ -319,6 +387,21 @@ function StudyPlanSection() {
               <p>
                 Days Left: {item.daysLeft}
               </p>
+              <p
+  className={
+    item.daysLeft <= 3
+      ? "text-red-600 font-bold"
+      : item.daysLeft <= 7
+      ? "text-yellow-600 font-bold"
+      : "text-green-600 font-bold"
+  }
+>
+  {item.daysLeft <= 3
+    ? "🚨 Critical"
+    : item.daysLeft <= 7
+    ? "⚠️ Moderate"
+    : "✅ Safe"}
+</p>
 
               <p>
                 Study: {item.studyHours}h/day
