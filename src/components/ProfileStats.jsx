@@ -62,37 +62,82 @@ function ProfileStats() {
     );
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow mb-6">
-      <h2 className="text-2xl font-bold mb-4">
-        Your Progress
-      </h2>
+  <div
+    className="
+    bg-gradient-to-br
+    from-violet-600
+    via-purple-600
+    to-indigo-700
+    text-white
+    p-8
+    rounded-3xl
+    shadow-2xl
+    mb-6
+  "
+  >
+    <div className="flex justify-between items-start">
+      <div>
+        <h2 className="text-4xl font-black mb-2">
+          🚀 Your Journey
+        </h2>
 
-      <p className="text-lg mb-2">
-        ⭐ XP: {xp}
-      </p>
+        <p className="text-xl opacity-90">
+          {rank}
+        </p>
+      </div>
 
-      <p className="text-lg mb-4">
-        {rank}
-      </p>
+      <div className="text-right">
+        <p className="text-4xl font-black">
+          ⭐ {xp}
+        </p>
 
-      <div className="w-full bg-gray-200 rounded-full h-4">
+        <p className="opacity-80">
+          Total XP
+        </p>
+      </div>
+    </div>
+
+    <div className="mt-8">
+      <div className="flex justify-between mb-2">
+        <span className="font-semibold">
+          Level Progress
+        </span>
+
+        <span>
+          {Math.round(progress)}%
+        </span>
+      </div>
+
+      <div className="w-full bg-white/20 rounded-full h-5">
         <div
-          className="bg-blue-600 h-4 rounded-full"
+          className="
+          bg-white
+          h-5
+          rounded-full
+          transition-all
+          duration-700
+        "
           style={{
             width: `${progress}%`,
           }}
         />
       </div>
 
-      <p className="mt-2 text-sm">
-        Progress: {xp}/{maxXP} XP
-      </p>
-
-      <p className="mt-2 font-semibold">
-        Next Rank: {nextRank}
+      <p className="mt-3">
+        {xp}/{maxXP} XP
       </p>
     </div>
-  );
-}
 
+    <div className="mt-6 p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
+      <p className="font-semibold">
+        🎯 Next Rank
+      </p>
+
+      <p className="text-xl mt-1">
+        {nextRank}
+      </p>
+    </div>
+  </div>
+);
+}
 export default ProfileStats;

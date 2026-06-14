@@ -1,95 +1,142 @@
 import { useState } from "react";
-import supabase from "../lib/supabase";
+import { generateMysteryTopic } from "../lib/gemini";
 
 function SyllabusGenerator() {
-  const [className, setClassName] =
-    useState("");
+const [mysteryTopic, setMysteryTopic] =
+  useState("");
 
-  const [subjectName, setSubjectName] =
-    useState("");
+const [explanation, setExplanation] =
+  useState("");
 
-  const generateTopics = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+const [challenge, setChallenge] =
+  useState("");
 
-    if (!user) return;
+const [loading, setLoading] =
+  useState(false);
 
-   const { data, error } = await supabase
-  .from("syllabus_topics")
-  .select("*");
+const revealTopic = async () => {
+  try {
+    setLoading(true);
 
-console.log("ALL DATA:", data);
+    const response =
+      await generateMysteryTopic(
+        "Pharmacology"
+      );
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
+    const topicMatch =
+      response.match(
+        /TOPIC:\s*([\s\S]*?)EXPLANATION:/i
+      );
 
-    if (!data || data.length === 0) {
-      alert("No syllabus found");
-      return;
-    }
+    const explanationMatch =
+      response.match(
+        /EXPLANATION:\s*([\s\S]*?)CHALLENGE:/i
+      );
 
-    const topicsToInsert =
-      data.map((topic) => ({
-        user_id: user.id,
-        subject_name:
-          subjectName,
-        topic_name:
-          topic.topic_name,
-        is_completed: false,
-      }));
+    const challengeMatch =
+      response.match(
+        /CHALLENGE:\s*([\s\S]*)/i
+      );
 
-    const { error: insertError } =
-      await supabase
-        .from("topics")
-        .insert(topicsToInsert);
-
-    if (insertError) {
-      alert(insertError.message);
-      return;
-    }
-
-    alert(
-      `${topicsToInsert.length} topics generated`
+    setMysteryTopic(
+      topicMatch?.[1]?.trim() || ""
     );
-  };
 
-  return (
-    <div className="bg-white p-6 rounded-2xl shadow mt-8">
-      <h2 className="text-2xl font-bold mb-4">
-        Generate Learning Path
-      </h2>
+    setExplanation(
+      explanationMatch?.[1]?.trim() ||
+        ""
+    );
 
-      <input
-        placeholder="Class"
-        value={className}
-        onChange={(e) =>
-          setClassName(e.target.value)
-        }
-        className="border p-2 rounded w-full mb-2"
-      />
+    setChallenge(
+      challengeMatch?.[1]?.trim() ||
+        ""
+    );
+  } catch (error) {
+    console.log(error);
+  } finally {
+    setLoading(false);
+  }
+};
 
-      <input
-        placeholder="Subject"
-        value={subjectName}
-        onChange={(e) =>
-          setSubjectName(
-            e.target.value
-          )
-        }
-        className="border p-2 rounded w-full mb-4"
-      />
 
-      <button
-        onClick={generateTopics}
-        className="bg-black text-white px-4 py-2 rounded"
-      >
-        Generate Topics
-      </button>
+return ( <div
+   className="
+   bg-gradient-to-br
+   from-violet-600
+   to-purple-700
+   text-white
+   p-8
+   rounded-3xl
+   shadow-2xl
+   mt-8
+ "
+ > <h2 className="text-4xl font-black mb-2">
+🎁 Mystery Learning </h2>
+
+
+  <p className="opacity-90 mb-6">
+    Discover a random topic and
+    challenge yourself today.
+  </p>
+
+  <button
+    onClick={revealTopic}
+    className="
+    bg-white
+    text-violet-700
+    px-6
+    py-3
+    rounded-2xl
+    font-bold
+    shadow-lg
+    hover:scale-105
+    transition-all
+    "
+  >
+   {
+  loading
+    ? "Generating..."
+    : "Reveal Topic"
+}
+  </button>
+
+ {mysteryTopic && (
+  <div className="mt-6 bg-white/10 p-5 rounded-2xl">
+
+    <p className="text-sm opacity-80">
+      ✨ Mystery Topic Found
+    </p>
+
+    <h3 className="text-3xl font-bold mt-2">
+      {mysteryTopic}
+    </h3>
+
+    <div className="mt-4">
+      <h4 className="font-bold">
+        📖 Why It Matters
+      </h4>
+
+      <p className="mt-2">
+        {explanation}
+      </p>
     </div>
-  );
+
+    <div className="mt-4 bg-black/20 p-4 rounded-xl">
+      <h4 className="font-bold">
+        🎯 Challenge
+      </h4>
+
+      <p className="mt-2">
+        {challenge}
+      </p>
+    </div>
+
+  </div>
+)}
+</div>
+
+);
+
 }
 
 export default SyllabusGenerator;

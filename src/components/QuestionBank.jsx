@@ -66,19 +66,66 @@ function QuestionBank() {
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow mt-8">
-      <h2 className="text-2xl font-bold mb-4">
-        Question Bank
-      </h2>
+    <div
+  className="
+  bg-gradient-to-br
+  from-white
+  to-blue-50
+  p-8
+  rounded-3xl
+  shadow-2xl
+  mt-8
+  border
+  border-blue-100
+"
+>
+  <h2 className="text-4xl font-black mb-2">
+  🧠 Question Bank
+</h2>
 
-      <div className="grid gap-2">
+<p className="text-slate-500 mb-6">
+  Create and manage practice questions
+</p>
+<div className="grid md:grid-cols-3 gap-4 mb-6">
+
+  <div className="bg-blue-500 text-white p-4 rounded-2xl shadow-lg">
+    <h3 className="text-3xl font-bold">
+      {questions.length}
+    </h3>
+    <p>Total Questions</p>
+  </div>
+
+  <div className="bg-green-500 text-white p-4 rounded-2xl shadow-lg">
+    <h3 className="text-3xl font-bold">
+      📝
+    </h3>
+    <p>Practice Mode</p>
+  </div>
+
+  <div className="bg-violet-500 text-white p-4 rounded-2xl shadow-lg">
+    <h3 className="text-3xl font-bold">
+      🎯
+    </h3>
+    <p>Question Creator</p>
+  </div>
+
+</div>
+
+      <div className="grid gap-4">
         <input
           placeholder="Subject"
           value={subject}
           onChange={(e) =>
             setSubject(e.target.value)
           }
-          className="border p-2 rounded"
+          className="
+p-4
+rounded-2xl
+border-2
+border-slate-200
+focus:outline-none
+focus:border-violet-500
+"
         />
 
         <input
@@ -87,7 +134,14 @@ function QuestionBank() {
           onChange={(e) =>
             setTopic(e.target.value)
           }
-          className="border p-2 rounded"
+          className="
+p-4
+rounded-2xl
+border-2
+border-slate-200
+focus:outline-none
+focus:border-violet-500
+"
         />
 
         <textarea
@@ -96,7 +150,14 @@ function QuestionBank() {
           onChange={(e) =>
             setQuestion(e.target.value)
           }
-          className="border p-2 rounded"
+          className="
+p-4
+rounded-2xl
+border-2
+border-slate-200
+focus:outline-none
+focus:border-violet-500
+"
         />
 
         <input
@@ -105,7 +166,14 @@ function QuestionBank() {
           onChange={(e) =>
             setOptionA(e.target.value)
           }
-          className="border p-2 rounded"
+          className="
+p-4
+rounded-2xl
+border-2
+border-slate-200
+focus:outline-none
+focus:border-violet-500
+"       
         />
 
         <input
@@ -148,8 +216,18 @@ function QuestionBank() {
 
         <button
           onClick={addQuestion}
-          className="bg-black text-white py-2 rounded"
-        >
+        className="
+bg-gradient-to-r
+from-violet-600
+to-purple-700
+text-white
+py-4
+rounded-2xl
+font-bold
+shadow-lg
+hover:scale-105
+transition-all
+"       >
           Add Question
         </button>
       </div>

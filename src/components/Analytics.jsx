@@ -55,35 +55,135 @@ function Analytics() {
     });
   };
 
-  return (
-    <div className="bg-white p-6 rounded-2xl shadow mb-6">
-      <h2 className="text-2xl font-bold mb-4">
-        📊 Analytics
-      </h2>
+return (
+  <div className="bg-white p-6 rounded-3xl shadow-xl mb-6">
+    <h2 className="text-3xl font-black mb-6">
+      📊 Analytics Dashboard
+    </h2>
 
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          📚 Topics:
+    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+      <div
+        className="
+        bg-gradient-to-r
+        from-blue-500
+        to-cyan-500
+        text-white
+        p-5
+        rounded-2xl
+        shadow-lg
+      "
+      >
+        <p className="text-4xl font-bold">
           {stats.topics}
-        </div>
+        </p>
 
-        <div>
-          ✅ Completed:
-          {stats.completed}
-        </div>
-
-        <div>
-          ⭐ XP:
-          {stats.xp}
-        </div>
-
-        <div>
-          🔥 Streak:
-          {stats.streak}
-        </div>
+        <p className="mt-2">
+          📚 Total Topics
+        </p>
       </div>
+
+      <div
+        className="
+        bg-gradient-to-r
+        from-green-500
+        to-emerald-600
+        text-white
+        p-5
+        rounded-2xl
+        shadow-lg
+      "
+      >
+        <p className="text-4xl font-bold">
+          {stats.completed}
+        </p>
+
+        <p className="mt-2">
+          ✅ Completed
+        </p>
+      </div>
+
+      <div
+        className="
+        bg-gradient-to-r
+        from-yellow-500
+        to-orange-500
+        text-white
+        p-5
+        rounded-2xl
+        shadow-lg
+      "
+      >
+        <p className="text-4xl font-bold">
+          {stats.xp}
+        </p>
+
+        <p className="mt-2">
+          ⭐ XP Earned
+        </p>
+      </div>
+
+      <div
+        className="
+        bg-gradient-to-r
+        from-violet-500
+        to-purple-700
+        text-white
+        p-5
+        rounded-2xl
+        shadow-lg
+      "
+      >
+        <p className="text-4xl font-bold">
+          {stats.streak}
+        </p>
+
+        <p className="mt-2">
+          🔥 Day Streak
+        </p>
+      </div>
+
     </div>
-  );
+
+    <div className="mt-8">
+      <h3 className="font-bold text-lg mb-3">
+        Progress Overview
+      </h3>
+
+      <div className="w-full bg-slate-200 rounded-full h-5">
+        <div
+          className="
+          h-5
+          rounded-full
+          bg-gradient-to-r
+          from-green-500
+          to-emerald-600
+          transition-all
+          duration-700
+        "
+          style={{
+            width: `${
+              stats.topics === 0
+                ? 0
+                : (
+                    stats.completed /
+                    stats.topics
+                  ) *
+                  100
+            }%`,
+          }}
+        />
+      </div>
+
+      <p className="mt-2 text-sm text-slate-600">
+        {stats.completed}/
+        {stats.topics}
+        {" "}
+        topics completed
+      </p>
+    </div>
+  </div>
+);
 }
 
 export default Analytics;

@@ -350,3 +350,32 @@ Be clear and educational.
 
   return result.response.text();
 };
+export async function generateMysteryTopic(subject) {
+  const prompt = `
+Choose ONE interesting topic from ${subject}.
+
+Return EXACTLY in this format:
+
+TOPIC:
+<topic>
+
+EXPLANATION:
+<why this topic matters>
+
+CHALLENGE:
+<one challenge question>
+
+Keep it short and motivating.
+`;
+
+  try {
+    const result =
+      await model.generateContent(
+        prompt
+      );
+
+    return result.response.text();
+  } catch (error) {
+    throw parseGeminiError(error);
+  }
+}

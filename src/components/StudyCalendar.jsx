@@ -33,12 +33,49 @@ function StudyCalendar() {
   );
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow mt-8">
-      <h2 className="text-2xl font-bold mb-4">
-        Study Calendar
-      </h2>
+    <div
+  className="
+  bg-gradient-to-br
+  from-white
+  to-violet-50
+  p-6
+  rounded-3xl
+  shadow-2xl
+  mt-8
+  border
+  border-violet-100
+"
+>
+      <h2 className="text-3xl font-black mb-6">
+  📅 Study Calendar
+</h2>
+      
 
       <Calendar
+       tileClassName={({ date, view }) => {
+  if (view !== "month") return "";
+
+  const formattedDate =
+    date.getFullYear() +
+    "-" +
+    String(
+      date.getMonth() + 1
+    ).padStart(2, "0") +
+    "-" +
+    String(
+      date.getDate()
+    ).padStart(2, "0");
+
+  if (
+    completedDates.includes(
+      formattedDate
+    )
+  ) {
+    return "completed-day";
+  }
+
+  return "";
+}} 
         tileContent={({ date, view }) => {
           if (view !== "month") return null;
 

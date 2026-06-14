@@ -134,47 +134,88 @@ setClaimed((prev) => [
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow mb-6">
-      <h2 className="text-2xl font-bold mb-4">
-        🎯 Daily Quests
-      </h2>
+  <div className="bg-white p-6 rounded-3xl shadow-xl mb-6">
+    <h2 className="text-3xl font-black mb-6">
+      🎯 Daily Missions
+    </h2>
 
+    <div className="space-y-4">
       {quests.map((quest) => (
         <div
           key={quest.id}
-          className="border rounded-lg p-3 mb-3"
+          className="
+          bg-gradient-to-r
+          from-orange-50
+          to-yellow-50
+          border-l-8
+          border-orange-500
+          rounded-2xl
+          p-5
+          shadow-lg
+        "
         >
-          <p className="font-semibold">
-            {quest.title}
-          </p>
+          <div className="flex justify-between items-center">
 
-          <p className="mb-2">
-            Reward:
-            +{quest.reward_xp} XP
-          </p>
+            <div>
+              <h3 className="text-xl font-bold">
+                {quest.title}
+              </h3>
 
-          {claimed.includes(
-            quest.id
-          ) ? (
-            <span className="bg-green-600 text-white px-3 py-1 rounded">
-              ✅ Claimed
-            </span>
-          ) : (
-            <button
-              onClick={() =>
-                claimReward(
-                  quest
-                )
-              }
-              className="bg-orange-500 text-white px-3 py-1 rounded"
-            >
-              Claim Reward
-            </button>
-          )}
+              <p className="mt-2 text-slate-600">
+                ⭐ Reward:
+                {" "}
+                {quest.reward_xp}
+                {" "}
+                XP
+              </p>
+            </div>
+
+            <div>
+              {claimed.includes(
+                quest.id
+              ) ? (
+                <span
+                  className="
+                  bg-green-600
+                  text-white
+                  px-4
+                  py-2
+                  rounded-xl
+                  font-semibold
+                "
+                >
+                  ✅ Claimed
+                </span>
+              ) : (
+                <button
+                  onClick={() =>
+                    claimReward(
+                      quest
+                    )
+                  }
+                  className="
+                  bg-gradient-to-r
+                  from-orange-500
+                  to-red-500
+                  text-white
+                  px-5
+                  py-2
+                  rounded-xl
+                  shadow-lg
+                  hover:scale-105
+                  transition-all
+                "
+                >
+                  Claim Reward
+                </button>
+              )}
+            </div>
+
+          </div>
         </div>
       ))}
     </div>
-  );
+  </div>
+);
 }
-
 export default DailyQuests;

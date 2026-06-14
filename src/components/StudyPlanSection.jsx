@@ -251,6 +251,14 @@ function StudyPlanSection() {
             savedPlans.length) *
             100
         );
+        const closestExam =
+  studyPlan.length > 0
+    ? Math.min(
+        ...studyPlan.map(
+          (p) => p.daysLeft
+        )
+      )
+    : 0;
         const todayMission =
   studyPlan.length > 0
     ? studyPlan[0]
@@ -258,6 +266,35 @@ function StudyPlanSection() {
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow mt-8">
+      <div className="grid md:grid-cols-4 gap-4 mb-6">
+  <div className="bg-blue-500 text-white p-4 rounded-2xl shadow-lg">
+    <h3 className="text-3xl font-bold">
+      {studyPlan.length}
+    </h3>
+    <p>📚 Exams</p>
+  </div>
+
+  <div className="bg-orange-500 text-white p-4 rounded-2xl shadow-lg">
+    <h3 className="text-3xl font-bold">
+      {closestExam}
+    </h3>
+    <p>⏳ Days Left</p>
+  </div>
+
+  <div className="bg-green-500 text-white p-4 rounded-2xl shadow-lg">
+    <h3 className="text-3xl font-bold">
+      {completedCount}
+    </h3>
+    <p>🔥 Completed</p>
+  </div>
+
+  <div className="bg-purple-500 text-white p-4 rounded-2xl shadow-lg">
+    <h3 className="text-3xl font-bold">
+      {progress}%
+    </h3>
+    <p>⭐ Progress</p>
+  </div>
+</div>
       <h2 className="text-2xl font-bold mb-4">
         Smart AI Study Planner
       </h2>
@@ -373,28 +410,35 @@ transition-all
 
           {studyPlan.map((item, index) => (
             <div
-              key={index}
-              className="border p-4 rounded-lg mb-2"
-            >
-              <strong>
-                {item.subject}
-              </strong>
+  key={index}
+  className="
+  bg-gradient-to-r
+  from-blue-50
+  to-purple-50
+  border-l-8
+  border-violet-500
+  p-5
+  rounded-2xl
+  shadow-lg
+  mb-4
+"
+>
+             <h3 className="text-2xl font-bold mb-2">
+  📚 {item.subject}
+</h3>
 
-              <p>
-                Priority: {item.priority}
-              </p>
+<p className="text-lg font-semibold">
+  ⏳ {item.daysLeft} Days Left
+</p>
 
-              <p>
-                Days Left: {item.daysLeft}
-              </p>
-              <p
-  className={
+<p
+  className={`mt-2 font-bold ${
     item.daysLeft <= 3
-      ? "text-red-600 font-bold"
+      ? "text-red-600"
       : item.daysLeft <= 7
-      ? "text-yellow-600 font-bold"
-      : "text-green-600 font-bold"
-  }
+      ? "text-yellow-600"
+      : "text-green-600"
+  }`}
 >
   {item.daysLeft <= 3
     ? "🚨 Critical"
@@ -403,9 +447,31 @@ transition-all
     : "✅ Safe"}
 </p>
 
-              <p>
-                Study: {item.studyHours}h/day
-              </p>
+<p className="mt-2">
+  🎯 Study Target:
+  {" "}
+  {item.studyHours}h/day
+</p>
+
+<p>
+  🔥 Priority:
+  {" "}
+  {item.priority}
+</p>
+
+<div className="mt-4">
+  <div className="w-full bg-slate-200 rounded-full h-3">
+    <div
+      className="bg-violet-600 h-3 rounded-full"
+      style={{
+        width: `${Math.max(
+          10,
+          100 - item.daysLeft * 5
+        )}%`,
+      }}
+    />
+  </div>
+</div>
             </div>
           ))}
         </div>

@@ -586,7 +586,32 @@ Topic Academy </h2>
       : "Generate Notes for Topics"}
   </button>
   </div>
- 
+ <div className="grid grid-cols-3 gap-4 mb-6">
+  <div className="bg-violet-500 text-white p-4 rounded-2xl">
+    <h3 className="text-3xl font-bold">
+      {topics.length}
+    </h3>
+    <p>Total Topics</p>
+  </div>
+
+  <div className="bg-green-500 text-white p-4 rounded-2xl">
+    <h3 className="text-3xl font-bold">
+      {
+        topics.filter(
+          (t) => t.is_completed
+        ).length
+      }
+    </h3>
+    <p>Completed</p>
+  </div>
+
+  <div className="bg-orange-500 text-white p-4 rounded-2xl">
+    <h3 className="text-3xl font-bold">
+      {topics.length}
+    </h3>
+    <p>Active Topics</p>
+  </div>
+</div>
   {topics.map((topic) => (
     
   <div
@@ -596,6 +621,9 @@ Topic Academy </h2>
     <div className="flex justify-between items-center">
       <div>
         <strong>{topic.subject_name}</strong>
+        <p className="text-lg font-semibold text-slate-700 mt-2">
+  {topic.topic_name}
+</p>
 
         {editingTopic === topic.id ? (
   <input
@@ -608,7 +636,14 @@ Topic Academy </h2>
     className="border p-1 rounded"
   />
 ) : (
-  <p>{topic.topic_name}</p>
+  <h3 className="text-2xl font-bold text-slate-800">
+  {topic.topic_name}
+</h3>
+>
+<p className="text-slate-500 mt-1">
+ 📚 {topic.subject_name}
+</p>
+
 )}
 
         <p>
@@ -618,7 +653,15 @@ Topic Academy </h2>
         </p>
       </div>
 
-    <div className="flex flex-wrap gap-3 mt-3">
+    <div className="
+px-4
+py-2
+rounded-xl
+font-semibold
+shadow-md
+hover:scale-105
+transition-all
+">
     <button
     onClick={() =>
       deleteTopic(topic.id)

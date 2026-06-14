@@ -63,54 +63,100 @@ function DashboardStats() {
     });
   };
 
-  return (
-    <div className="grid md:grid-cols-5 gap-4 mb-8">
-      <div className="bg-white p-5 rounded-xl shadow">
-        <h3 className="text-gray-500 text-sm">
-          Subjects
-        </h3>
-        <p className="text-3xl font-bold">
-          📚 {stats.subjects}
-        </p>
-      </div>
+ return (
+  <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-5 mb-8">
 
-      <div className="bg-white p-5 rounded-xl shadow">
-        <h3 className="text-gray-500 text-sm">
-          Exams
-        </h3>
-        <p className="text-3xl font-bold">
-          📝 {stats.exams}
-        </p>
-      </div>
+    <div className="
+      bg-gradient-to-br
+      from-blue-500
+      to-cyan-500
+      text-white
+      p-6
+      rounded-3xl
+      shadow-xl
+    ">
+      <p className="text-sm opacity-80">
+        Subjects
+      </p>
 
-      <div className="bg-white p-5 rounded-xl shadow">
-        <h3 className="text-gray-500 text-sm">
-          Plans
-        </h3>
-        <p className="text-3xl font-bold">
-          📋 {stats.plans}
-        </p>
-      </div>
-
-      <div className="bg-white p-5 rounded-xl shadow">
-        <h3 className="text-gray-500 text-sm">
-          Completed
-        </h3>
-        <p className="text-3xl font-bold">
-          ✅ {stats.completed}
-        </p>
-      </div>
-
-      <div className="bg-white p-5 rounded-xl shadow">
-        <h3 className="text-gray-500 text-sm">
-          Streak
-        </h3>
-        <p className="text-3xl font-bold">
-          🔥 {stats.streak}
-        </p>
-      </div>
+      <h3 className="text-4xl font-black mt-2">
+        📚 {stats.subjects}
+      </h3>
     </div>
-  );
-}
 
+    <div className="
+      bg-gradient-to-br
+      from-orange-500
+      to-red-500
+      text-white
+      p-6
+      rounded-3xl
+      shadow-xl
+    ">
+      <p className="text-sm opacity-80">
+        Exams
+      </p>
+
+      <h3 className="text-4xl font-black mt-2">
+        📝 {stats.exams}
+      </h3>
+    </div>
+
+    <div className="
+      bg-gradient-to-br
+      from-violet-500
+      to-purple-700
+      text-white
+      p-6
+      rounded-3xl
+      shadow-xl
+    ">
+      <p className="text-sm opacity-80">
+        Study Plans
+      </p>
+
+      <h3 className="text-4xl font-black mt-2">
+        📋 {stats.plans}
+      </h3>
+    </div>
+
+    <div className="
+      bg-gradient-to-br
+      from-green-500
+      to-emerald-600
+      text-white
+      p-6
+      rounded-3xl
+      shadow-xl
+    ">
+      <p className="text-sm opacity-80">
+        Completed
+      </p>
+
+      <h3 className="text-4xl font-black mt-2">
+        ✅ {stats.completed}
+      </h3>
+    </div>
+
+    <div className="
+      bg-gradient-to-br
+      from-pink-500
+      to-rose-600
+      text-white
+      p-6
+      rounded-3xl
+      shadow-xl
+    ">
+      <p className="text-sm opacity-80">
+        Study Streak
+      </p>
+
+      <h3 className="text-4xl font-black mt-2">
+        🔥 {stats.streak}
+      </h3>
+    </div>
+
+  </div>
+);
+}
 export default DashboardStats;

@@ -9,6 +9,7 @@ function PlannerPage() {
 
       <StudyPlanSection />
 
+  
       <StudyCalendar />
     </>
   );
