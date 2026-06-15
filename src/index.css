@@ -34,3 +34,6 @@
 .react-calendar__tile:hover {
   transform: translateY(-2px);
 }
+button {
+  cursor: pointer;
+}

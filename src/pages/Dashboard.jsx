@@ -90,17 +90,20 @@ return (
 >
       {/* Sidebar */}
       <div className="
-    w-72
-    bg-slate-950
-    text-white
-    shadow-2xl
-    p-6
-    sticky
-    top-0
-    h-screen
-    border-r
-    border-primary-900
-    ">
+hidden
+lg:flex
+w-72
+flex-col
+bg-slate-950
+text-white
+shadow-2xl
+p-6
+sticky
+top-0
+h-screen
+border-r
+border-primary-900
+">
         <div className="mb-10">
   <h1 className="text-3xl font-black text-primary-400">
     NEBULA
@@ -250,8 +253,18 @@ ${
         </ul>
       </div>
 
-    <div className="flex-1 p-8">
-  <h1 className="text-4xl font-bold mb-8">
+   <div className="
+flex-1
+p-4
+md:p-8
+overflow-x-hidden
+">
+  <h1  className="
+text-2xl
+md:text-4xl
+font-bold
+mb-8
+">
      Mission Control 🚀
   </h1>
 

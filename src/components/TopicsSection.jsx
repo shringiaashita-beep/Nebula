@@ -17,7 +17,7 @@ function TopicsSection({
   selectedSubject,
 }) {
   const button3D =
-  "relative overflow-hidden rounded-2xl px-5 py-3 font-semibold text-white transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 active:translate-y-0 shadow-[0_8px_0_rgba(0,0,0,0.25),0_15px_25px_rgba(0,0,0,0.18)]";
+"cursor-pointer relative overflow-hidden rounded-2xl px-5 py-3 font-semibold text-white transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 active:translate-y-0 shadow-[0_8px_0_rgba(0,0,0,0.25),0_15px_25px_rgba(0,0,0,0.18)]";
   console.log(
   "SELECTED SUBJECT:",
   selectedSubject
@@ -26,6 +26,8 @@ const [subjectName, setSubjectName] = useState("");
 const [topicName, setTopicName] = useState("");
 const [level, setLevel] = useState("");
 const [topics, setTopics] = useState([]);
+const [openMenu, setOpenMenu] =
+  useState(null);
 const [bulkGenerating, setBulkGenerating] = useState(false);
 const [questionGeneratingTopicId, setQuestionGeneratingTopicId] = useState(null);
 const [editingTopic, setEditingTopic] =
@@ -616,8 +618,21 @@ Topic Academy </h2>
     
   <div
     key={topic.id}
-   className="bg-white/80 backdrop-blur-lg border border-slate-200 p-6 rounded-3xl mb-4 shadow-xl hover:shadow-2xl transition-all duration-300"
-  >
+   className="
+bg-white/80
+backdrop-blur-lg
+border
+border-slate-200
+p-6
+rounded-3xl
+mb-4
+shadow-xl
+hover:shadow-2xl
+transition-all
+duration-300
+overflow-visible
+"
+>
     <div className="flex justify-between items-center">
       <div>
         <strong>{topic.subject_name}</strong>
@@ -662,75 +677,134 @@ shadow-md
 hover:scale-105
 transition-all
 ">
-    <button
-    onClick={() =>
-      deleteTopic(topic.id)
-    }
-   className={`${button3D} bg-gradient-to-b from-red-400 to-red-700 text-sm`}
-  >
-    Delete
-  </button>
-  <button
-    onClick={() =>
-      setNotesTopic(topic)
-    }
-    className={`${button3D} bg-gradient-to-b from-yellow-300 to-amber-600 text-sm`}
-  >
-    View Notes
-  </button>
+   <div className="relative overflow-visible">
 
   <button
     onClick={() =>
-      setFlashcardTopic(topic)
+      setOpenMenu(
+        openMenu === topic.id
+          ? null
+          : topic.id
+      )
     }
-    className={`${button3D} bg-gradient-to-b from-purple-400 to-purple-700 text-sm`}
+   className="
+cursor-pointer
+bg-slate-800
+text-white
+px-4
+py-2
+rounded-xl
+hover:bg-slate-700
+"
   >
-    Flashcards
-  </button>
-  <button
-  onClick={() =>
-    setMindMapTopic(topic)
-  }
-  className={`${button3D} bg-gradient-to-b from-green-400 to-green-700 text-sm`}
->
-  Mind Map
-</button>
-<button
-  onClick={() =>
-    setRevisionTopic(topic)
-  }
-  className={`${button3D} bg-gradient-to-b from-cyan-400 to-cyan-700 text-sm`}
->
-  ⚡ Quick Revision
-</button>
-  <button
-    onClick={() =>
-      generateHardQuestionsForTopic(topic)
-    }
-    className={`${button3D} bg-gradient-to-b from-pink-400 to-pink-700 text-sm`}
-    disabled={
-      questionGeneratingTopicId === topic.id
-    }
-  >
-    {questionGeneratingTopicId === topic.id
-      ? "Generating..."
-      : "Generate 30 Hard Questions"}
+    ⚡ Actions ▲
   </button>
 
-  {!topic.is_completed ? (
-    <button
-      onClick={() =>
-        setSelectedTopic(topic)
-      }
-      className={`${button3D} bg-gradient-to-b from-blue-400 to-blue-700 text-sm`}
-    >
-      Take Challenge
-    </button>
-  ) : (
-    <span className="bg-gradient-to-b from-emerald-400 to-emerald-700 text-white px-4 py-2 rounded-xl shadow-lg font-semibold">
-      Completed
-    </span>
+  {openMenu === topic.id && (
+    <div
+  className="
+  absolute
+  right-0
+  bottom-full
+  mb-3
+  w-72
+  bg-white
+  rounded-2xl
+  shadow-2xl
+  border
+  z-[9999]
+  overflow-hidden
+  "
+>
+      <button
+        onClick={() =>
+          setNotesTopic(topic)
+        }
+        className="w-full text-left p-3 hover:bg-slate-100"
+      >
+        📖 View Notes
+      </button>
+
+      <button
+        onClick={() =>
+          setFlashcardTopic(topic)
+        }
+        className="w-full text-left p-3 hover:bg-slate-100"
+      >
+        🎴 Flashcards
+      </button>
+
+      <button
+        onClick={() =>
+          setMindMapTopic(topic)
+        }
+        className="w-full text-left p-3 hover:bg-slate-100"
+      >
+        🧠 Mind Map
+      </button>
+
+      <button
+        onClick={() =>
+          setRevisionTopic(topic)
+        }
+        className="w-full text-left p-3 hover:bg-slate-100"
+      >
+        ⚡ Quick Revision
+      </button>
+
+      <button
+        onClick={() =>
+          generateHardQuestionsForTopic(
+            topic
+          )
+        }
+        className="w-full text-left p-3 hover:bg-slate-100"
+      >
+        🎯 Generate 30 Hard Questions
+      </button>
+
+      {!topic.is_completed && (
+        <button
+          onClick={() =>
+            setSelectedTopic(topic)
+          }
+          className="w-full text-left p-3 hover:bg-slate-100"
+        >
+          🏆 Take Challenge
+        </button>
+      )}
+
+      <button
+        onClick={() =>
+          deleteTopic(topic.id)
+        }
+        className="w-full text-left p-3 hover:bg-red-50 text-red-600"
+      >
+        🗑 Delete
+      </button>
+
+    </div>
   )}
+
+</div>    
+ 
+   <span
+  className="
+  bg-gradient-to-r
+  from-yellow-400
+  via-amber-500
+  to-orange-500
+  text-white
+  px-5
+  py-2
+  rounded-full
+  shadow-lg
+  font-bold
+  "
+>
+  🏆 Mastered
+</span>
+  
 </div>
     </div>
 

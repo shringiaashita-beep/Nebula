@@ -117,7 +117,7 @@ function StudyGalaxy({
         }}
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
       >
-        <div className="w-32 h-32 rounded-full bg-primary-500 flex items-center justify-center text-white text-4xl shadow-[0_0_80px_rgba(59,130,246,0.8)]">
+        <div className="w-40 h-40 rounded-full bg-primary-500 flex items-center justify-center text-white text-6xl shadow-[0_0_80px_rgba(59,130,246,0.8)]">
           🧠
         </div>
       </motion.div>
@@ -135,14 +135,13 @@ function StudyGalaxy({
                 positions.length
             ];
             const colors = [
-              "bg-purple-500",
-              "bg-emerald-500",
-              "bg-yellow-500",
-              "bg-pink-500",
-              "bg-orange-500",
-              "bg-red-500",
-              "bg-indigo-500",
-            ];
+  "bg-gradient-to-br from-violet-600 to-purple-700",
+  "bg-gradient-to-br from-cyan-500 to-blue-600",
+  "bg-gradient-to-br from-emerald-500 to-green-600",
+  "bg-gradient-to-br from-pink-500 to-rose-600",
+  "bg-gradient-to-br from-orange-500 to-red-600",
+  "bg-gradient-to-br from-indigo-500 to-violet-700",
+];
 
 const color =
   colors[
@@ -175,31 +174,42 @@ const color =
               }
             >
               <div
-onClick={() => {
-  console.log(
-    "CLICKED",
-    subject.name
-  );
+  onClick={() => {
+    setSelectedSubject(
+      subject.name
+    );
 
-  setSelectedSubject(
-    subject.name
-  );
-
-  fetchTopicsForSubject(
-    subject.name
-  );
-}}
-  className={`w-24 h-24 ${color}
-  flex items-center justify-center
-  text-white font-bold text-center p-2
-  cursor-pointer hover:scale-110
-  transition duration-300`}
+    fetchTopicsForSubject(
+      subject.name
+    );
+  }}
+  className={`
+  w-52
+  h-32
+  ${color}
+  rounded-3xl
+  p-4
+  cursor-pointer
+  shadow-2xl
+  hover:scale-105
+  hover:-translate-y-2
+  transition-all
+  duration-300
+  flex
+  flex-col
+  justify-center
+  `}
 >
-  
-                {
-                  subject.name
-                }
-              </div>
+
+  <h3 className="text-white text-lg font-bold">
+    {subject.name}
+  </h3>
+
+  <p className="text-white/80 text-sm mt-1">
+    Continue Learning →
+  </p>
+
+</div>
             </motion.div>
           );
         }
