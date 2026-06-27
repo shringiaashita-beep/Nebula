@@ -1,142 +1,160 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { generateMysteryTopic } from "../lib/gemini";
+import supabase from "../lib/supabase";
 
 function SyllabusGenerator() {
-const [mysteryTopic, setMysteryTopic] =
-  useState("");
+  const [mysteryTopic, setMysteryTopic] = useState("");
+  const [explanation, setExplanation] = useState("");
+  const [challenge, setChallenge] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [subjects, setSubjects] = useState([]);
+  const [selectedSubject, setSelectedSubject] = useState("");
 
-const [explanation, setExplanation] =
-  useState("");
+  useEffect(() => {
+    fetchSubjects();
+  }, []);
 
-const [challenge, setChallenge] =
-  useState("");
+  const fetchSubjects = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      const { data, error } = await supabase
+        .from("subjects")
+        .select("*")
+        .eq("user_id", user.id);
 
-const [loading, setLoading] =
-  useState(false);
+      if (error) {
+        console.error("Failed to load subjects for syllabus generator:", error);
+        return;
+      }
 
-const revealTopic = async () => {
-  try {
-    setLoading(true);
+      setSubjects(data || []);
+      if (data && data.length > 0) {
+        setSelectedSubject(data[0].name);
+      } else {
+        setSelectedSubject("Pharmacology");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-    const response =
-      await generateMysteryTopic(
-        "Pharmacology"
-      );
+  const revealTopic = async () => {
+    try {
+      setLoading(true);
+      const subjectToQuery = selectedSubject || "Pharmacology";
+      const response = await generateMysteryTopic(subjectToQuery);
 
-    const topicMatch =
-      response.match(
-        /TOPIC:\s*([\s\S]*?)EXPLANATION:/i
-      );
+      const topicMatch = response.match(/TOPIC:\s*([\s\S]*?)EXPLANATION:/i);
+      const explanationMatch = response.match(/EXPLANATION:\s*([\s\S]*?)CHALLENGE:/i);
+      const challengeMatch = response.match(/CHALLENGE:\s*([\s\S]*)/i);
 
-    const explanationMatch =
-      response.match(
-        /EXPLANATION:\s*([\s\S]*?)CHALLENGE:/i
-      );
-
-    const challengeMatch =
-      response.match(
-        /CHALLENGE:\s*([\s\S]*)/i
-      );
-
-    setMysteryTopic(
-      topicMatch?.[1]?.trim() || ""
-    );
-
-    setExplanation(
-      explanationMatch?.[1]?.trim() ||
-        ""
-    );
-
-    setChallenge(
-      challengeMatch?.[1]?.trim() ||
-        ""
-    );
-  } catch (error) {
-    console.log(error);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-return ( <div
-   className="
-   bg-gradient-to-br
-   from-violet-600
-   to-purple-700
-   text-white
-   p-8
-   rounded-3xl
-   shadow-2xl
-   mt-8
- "
- > <h2 className="text-4xl font-black mb-2">
-🎁 Mystery Learning </h2>
+      setMysteryTopic(topicMatch?.[1]?.trim() || "");
+      setExplanation(explanationMatch?.[1]?.trim() || "");
+      setChallenge(challengeMatch?.[1]?.trim() || "");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
-  <p className="opacity-90 mb-6">
-    Discover a random topic and
-    challenge yourself today.
-  </p>
+  return (
+    <div className="arc-card p-6 space-y-5" style={{ borderTop: "2px solid var(--arc-gold-500)" }}>
+      {/* Header */}
+      <div>
+        <h2 className="arc-font-display text-2xl font-bold arc-text-gradient">🎁 Mystery Learning</h2>
+        <p className="text-sm mt-1" style={{ color: "var(--arc-text-secondary)" }}>
+          Discover a random topic and challenge yourself today.
+        </p>
+      </div>
 
-  <button
-    onClick={revealTopic}
-    className="
-    bg-white
-    text-violet-700
-    px-6
-    py-3
-    rounded-2xl
-    font-bold
-    shadow-lg
-    hover:scale-105
-    transition-all
-    "
-  >
-   {
-  loading
-    ? "Generating..."
-    : "Reveal Topic"
-}
-  </button>
+      {/* Subject selector */}
+      <div>
+        <label className="block text-xs font-bold uppercase tracking-widest mb-2"
+          style={{ color: "var(--arc-text-muted)" }}>
+          Select Subject
+        </label>
+        {subjects.length > 0 ? (
+          <select
+            value={selectedSubject}
+            onChange={(e) => setSelectedSubject(e.target.value)}
+            className="arc-input w-full max-w-xs text-sm"
+            style={{ background: "rgba(0,0,0,0.4)", colorScheme: "dark" }}
+          >
+            {subjects.map((sub) => (
+              <option key={sub.id} value={sub.name} style={{ background: "#090A0F", color: "#fff" }}>
+                {sub.name}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <input
+            type="text"
+            placeholder="Enter subject (e.g. Pharmacology)"
+            value={selectedSubject}
+            onChange={(e) => setSelectedSubject(e.target.value)}
+            className="arc-input w-full max-w-xs text-sm"
+            style={{ background: "rgba(0,0,0,0.4)" }}
+          />
+        )}
+      </div>
 
- {mysteryTopic && (
-  <div className="mt-6 bg-white/10 p-5 rounded-2xl">
+      <button
+        onClick={revealTopic}
+        disabled={loading}
+        className="arc-btn-gold px-6 py-2.5 text-sm rounded-xl"
+      >
+        {loading ? "Generating…" : "Reveal Topic"}
+      </button>
 
-    <p className="text-sm opacity-80">
-      ✨ Mystery Topic Found
-    </p>
+      {/* Result card */}
+      {mysteryTopic && (
+        <div className="space-y-4">
+          <div
+            className="p-5 rounded-xl space-y-3"
+            style={{
+              background: "rgba(212,175,55,0.05)",
+              border: "1px solid rgba(212,175,55,0.2)",
+            }}
+          >
+            <p className="text-xs font-bold uppercase tracking-widest"
+              style={{ color: "var(--arc-gold-400)" }}>
+              ✨ Mystery Topic Found
+            </p>
+            <h3 className="arc-font-display text-xl font-bold arc-text-gradient">
+              {mysteryTopic}
+            </h3>
 
-    <h3 className="text-3xl font-bold mt-2">
-      {mysteryTopic}
-    </h3>
+            <div>
+              <h4 className="text-sm font-bold mb-1" style={{ color: "var(--arc-text-secondary)" }}>
+                📖 Why It Matters
+              </h4>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--arc-text-secondary)" }}>
+                {explanation}
+              </p>
+            </div>
 
-    <div className="mt-4">
-      <h4 className="font-bold">
-        📖 Why It Matters
-      </h4>
-
-      <p className="mt-2">
-        {explanation}
-      </p>
+            <div
+              className="p-4 rounded-xl"
+              style={{ background: "rgba(0,0,0,0.3)", border: "1px solid var(--arc-border)" }}
+            >
+              <h4 className="text-sm font-bold mb-1" style={{ color: "var(--arc-text-secondary)" }}>
+                🎯 Challenge
+              </h4>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--arc-text-secondary)" }}>
+                {challenge}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-
-    <div className="mt-4 bg-black/20 p-4 rounded-xl">
-      <h4 className="font-bold">
-        🎯 Challenge
-      </h4>
-
-      <p className="mt-2">
-        {challenge}
-      </p>
-    </div>
-
-  </div>
-)}
-</div>
-
-);
+  );
 
 }
 
 export default SyllabusGenerator;
+

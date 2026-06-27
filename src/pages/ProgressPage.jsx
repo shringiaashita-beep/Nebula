@@ -8,23 +8,21 @@ function ProgressPage() {
     <div className="space-y-6">
 
       {/* Hero Section */}
-      <div className="
-        bg-gradient-to-r
-        from-violet-600
-        to-purple-700
-        text-white
-        p-8
-        rounded-3xl
-        shadow-2xl
-      ">
-        <h1 className="text-4xl font-black mb-2">
-          🏆 Progress Command Center
-        </h1>
-
-        <p className="text-lg opacity-90">
-          Track your growth, achievements,
-          streaks and study performance.
-        </p>
+      <div
+        className="arc-card p-7 relative overflow-hidden"
+        style={{ borderTop: "2px solid var(--arc-gold-500)" }}
+      >
+        <div className="absolute top-0 right-0 w-48 h-48 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 70%)", transform: "translate(30%, -30%)" }} />
+        <div className="relative">
+          <span className="arc-badge arc-badge-gold mb-3 inline-flex">Progress Telemetry</span>
+          <h1 className="arc-font-display text-3xl font-bold arc-text-gradient mt-2">
+            🏆 Progress Command Center
+          </h1>
+          <p className="text-sm mt-2 leading-relaxed" style={{ color: "var(--arc-text-secondary)" }}>
+            Track your growth, achievements, streaks and study performance.
+          </p>
+        </div>
       </div>
 
       <Analytics />

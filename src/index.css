@@ -1,39 +1,527 @@
 @import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════
+   ARCLIGHT DESIGN SYSTEM — GLOBAL TOKEN SET
+   Nebula AI Study Platform — Premium Obsidian + Gold Theme
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  /* ── Base Background Layers ── */
+  --arc-bg-base:         #090A0F;
+  --arc-bg-surface:      #12141C;
+  --arc-bg-elevated:     #1A1D28;
+  --arc-border:          rgba(255, 255, 255, 0.05);
+  --arc-border-subtle:   rgba(255, 255, 255, 0.08);
+  --arc-border-gold:     rgba(212, 175, 55, 0.25);
+
+  /* ── Gold / Amber Accent Palette ── */
+  --arc-gold-300:        #FCD34D;
+  --arc-gold-400:        #F59E0B;
+  --arc-gold-500:        #D4AF37;
+  --arc-gold-600:        #AA7C11;
+  --arc-gold-glow:       rgba(212, 175, 55, 0.15);
+  --arc-gold-glow-lg:    rgba(212, 175, 55, 0.28);
+
+  /* ── Typography Scale ── */
+  --arc-text-hero:       #FFFFFF;
+  --arc-text-primary:    #E2E8F0;
+  --arc-text-secondary:  #94A3B8;
+  --arc-text-muted:      #8E9BB0;
+
+  /* ── Semantic Signals ── */
+  --arc-success:         #10B981;
+  --arc-error:           #EF4444;
+  --arc-warning:         #F59E0B;
+
+  /* ── Legacy dynamic primary — kept for ThemeContext compatibility ── */
+  --color-primary-50:  #f0f9ff;
+  --color-primary-100: #e0f2fe;
+  --color-primary-200: #bae6fd;
+  --color-primary-300: #7dd3fc;
+  --color-primary-400: #38bdf8;
+  --color-primary-500: #0ea5e9;
+  --color-primary-600: #0284c7;
+  --color-primary-700: #0369a1;
+  --color-primary-800: #075985;
+  --color-primary-900: #0c4a6e;
+  --sidebar-accent:    #0ea5e9;
+}
+
+/* ── Light Mode Token Overrides ── */
+html:not(.dark) {
+  /* ── Base Background Layers ── */
+  --arc-bg-base:         #F8FAFC;
+  --arc-bg-surface:      #FFFFFF;
+  --arc-bg-elevated:     #F1F5F9;
+  --arc-border:          rgba(15, 23, 42, 0.08);
+  --arc-border-subtle:   rgba(15, 23, 42, 0.05);
+  --arc-border-gold:     rgba(180, 140, 20, 0.25);
+
+  /* ── Gold / Amber Accent Palette ── */
+  --arc-gold-300:        #B48C14;
+  --arc-gold-400:        #AA7C11;
+  --arc-gold-500:        #AA7C11;
+  --arc-gold-600:        #855C08;
+  --arc-gold-glow:       rgba(170, 124, 17, 0.08);
+  --arc-gold-glow-lg:    rgba(170, 124, 17, 0.15);
+
+  /* ── Typography Scale ── */
+  --arc-text-hero:       #0F172A;
+  --arc-text-primary:    #1E293B;
+  --arc-text-secondary:  #475569;
+  --arc-text-muted:      #64748B;
+}
+
+html:not(.dark) .arc-text-gradient {
+  background: linear-gradient(135deg, #1E3A8A 0%, #D946EF 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+html:not(.dark) .arc-text-gold {
+  background: linear-gradient(135deg, #D97706, #EC4899) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+html:not(.dark) h1,
+html:not(.dark) h2,
+html:not(.dark) h3,
+html:not(.dark) h4 {
+  color: #1E3A8A !important;
+}
+
+/* ── Light Mode Button Styles ── */
+html:not(.dark) .arc-btn-gold {
+  background: linear-gradient(135deg, #F59E0B, #EC4899) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25) !important;
+  border: none !important;
+}
+
+html:not(.dark) .arc-btn-gold:hover {
+  filter: brightness(1.1) !important;
+  box-shadow: 0 4px 20px rgba(236, 72, 153, 0.35) !important;
+}
+
+html:not(.dark) .arc-btn-ghost {
+  background: rgba(59, 130, 246, 0.05) !important;
+  border: 1px solid rgba(59, 130, 246, 0.2) !important;
+  color: #2563EB !important;
+}
+
+html:not(.dark) .arc-btn-ghost:hover {
+  background: rgba(59, 130, 246, 0.12) !important;
+  border-color: #2563EB !important;
+  color: #1D4ED8 !important;
+}
+
+/* ── Light Mode Card Options Buttons ── */
+html:not(.dark) .arc-card button:not(.arc-btn-gold) {
+  background: #F1F5F9;
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+html:not(.dark) .arc-card button:not(.arc-btn-gold):hover {
+  border-color: #3B82F6;
+  background: rgba(59, 130, 246, 0.05);
+}
+
+html:not(.dark) .arc-spotlight {
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(236, 72, 153, 0.03) 0%, transparent 40%),
+    var(--arc-bg-base) !important;
+}
+
+/* ═══════════════════════════════════════
+   GLOBAL BASE STYLES
+   ═══════════════════════════════════════ */
+html, body, #root {
+  min-height: 100vh;
+  background-color: var(--arc-bg-base);
+  color: var(--arc-text-primary);
+  font-family: "Inter", "Plus Jakarta Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* ═══════════════════════════════════════
+   ARCLIGHT UTILITY CLASSES
+   ═══════════════════════════════════════ */
+
+/* ── Card Components ── */
+.arc-card {
+  background: var(--arc-bg-surface);
+  border: 1px solid var(--arc-border);
+  border-radius: 16px;
+}
+
+.arc-card-elevated {
+  background: var(--arc-bg-elevated);
+  border: 1px solid var(--arc-border-subtle);
+  border-radius: 16px;
+}
+
+/* ── Ambient Background Spotlights ── */
+.arc-spotlight {
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(212, 175, 55, 0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(212, 175, 55, 0.04) 0%, transparent 40%),
+    var(--arc-bg-base);
+  min-height: 100vh;
+}
+
+/* ── Typography ── */
+.arc-text-gradient {
+  background: linear-gradient(to bottom, #FFFFFF, #94A3B8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.arc-text-gold {
+  background: linear-gradient(135deg, var(--arc-gold-400), var(--arc-gold-600));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.arc-font-display {
+  font-family: "Playfair Display", Georgia, serif;
+}
+
+/* ── Buttons ── */
+.arc-btn-gold {
+  background: linear-gradient(135deg, var(--arc-gold-500), var(--arc-gold-600));
+  color: #0B0C10;
+  font-weight: 700;
+  border-radius: 12px;
+  box-shadow: 0 0 20px var(--arc-gold-glow);
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.arc-btn-gold:hover:not(:disabled) {
+  filter: brightness(1.12);
+  box-shadow: 0 0 36px var(--arc-gold-glow-lg);
+  transform: translateY(-1px);
+}
+
+.arc-btn-gold:active:not(:disabled) {
+  transform: translateY(0);
+  filter: brightness(0.96);
+}
+
+.arc-btn-gold:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.arc-btn-ghost {
+  background: transparent;
+  border: 1px solid var(--arc-border-subtle);
+  color: var(--arc-text-secondary);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.arc-btn-ghost:hover {
+  border-color: var(--arc-gold-500);
+  color: var(--arc-gold-400);
+  background: rgba(212, 175, 55, 0.05);
+}
+
+/* ── Input Fields ── */
+.arc-input {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--arc-border-subtle);
+  color: var(--arc-text-primary);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  transition: all 0.2s ease;
+  font-family: "Inter", sans-serif;
+}
+
+.arc-input::placeholder {
+  color: var(--arc-text-muted);
+}
+
+.arc-input:focus {
+  outline: none;
+  border-color: var(--arc-gold-500);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
+}
+
+.arc-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Gold Top-Border Card Accent ── */
+.arc-card-gold-top {
+  background: var(--arc-bg-surface);
+  border: 1px solid var(--arc-border);
+  border-top: 2px solid var(--arc-gold-500);
+  border-radius: 16px;
+}
+
+/* ── Sidebar nav item ── */
+.arc-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.625rem 1rem;
+  border-radius: 10px;
+  color: var(--arc-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.arc-nav-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--arc-text-primary);
+}
+
+.arc-nav-item.active {
+  background: rgba(212, 175, 55, 0.08);
+  border-color: rgba(212, 175, 55, 0.2);
+  color: var(--arc-gold-400);
+  font-weight: 600;
+}
+
+/* ── Divider ── */
+.arc-divider {
+  border: none;
+  border-top: 1px solid var(--arc-border);
+  margin: 0;
+}
+
+/* ── Gold progress ring glow ── */
+.arc-ring-gold {
+  box-shadow: 0 0 16px var(--arc-gold-glow);
+}
+
+/* ── Status badges ── */
+.arc-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.arc-badge-gold {
+  background: rgba(212, 175, 55, 0.12);
+  color: var(--arc-gold-400);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.arc-badge-success {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10B981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.arc-badge-error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #EF4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* ── Inline alert boxes ── */
+.arc-alert-error {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #FCA5A5;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.arc-alert-success {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #6EE7B7;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ══════════════════════════════════════════════
+   LEGACY COMPAT — kept for existing components
+   ══════════════════════════════════════════════ */
+
+/* Calendar styles */
 .completed-day {
-  background: linear-gradient(
-    135deg,
-    #8b5cf6,
-    #6366f1
-  ) !important;
+  background: linear-gradient(135deg, #D4AF37, #AA7C11) !important;
+  color: #0B0C10 !important;
+  border-radius: 12px !important;
+  transform: scale(1.02);
+  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.25) !important;
+}
 
-  color: white !important;
+.react-calendar__tile--now {
+  background: rgba(212, 175, 55, 0.05) !important;
+  border: 1px solid var(--arc-gold-500) !important;
+  color: var(--arc-gold-400) !important;
+  border-radius: 12px;
+}
 
-  border-radius: 16px !important;
-
-  transform: scale(1.05);
-
-  box-shadow:
-    0 8px 20px rgba(
-      99,
-      102,
-      241,
-      0.4
-    );
+.react-calendar__tile--active {
+  background: linear-gradient(135deg, var(--arc-gold-500), var(--arc-gold-600)) !important;
+  color: #090A0F !important;
+  font-weight: 700 !important;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.25) !important;
 }
 
 .react-calendar {
   width: 100% !important;
   border: none !important;
+  background: var(--arc-bg-surface) !important;
+  color: var(--arc-text-primary) !important;
 }
 
 .react-calendar__tile {
   border-radius: 12px;
   transition: all 0.2s;
+  color: var(--arc-text-primary) !important;
 }
 
 .react-calendar__tile:hover {
   transform: translateY(-2px);
+  background: rgba(212, 175, 55, 0.08) !important;
 }
-button {
-  cursor: pointer;
+
+.react-calendar__navigation button {
+  color: var(--arc-text-primary) !important;
+}
+
+/* Legacy glass-card — remapped to arc token */
+.glass-card {
+  background: var(--arc-bg-surface);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--arc-border);
+}
+
+/* Legacy premium-input — remapped */
+.premium-input {
+  transition: all 0.2s ease-in-out;
+}
+
+.premium-input:focus {
+  outline: none;
+  border-color: var(--arc-gold-500);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
+}
+
+/* Legacy premium-btn — remapped to gold */
+.premium-btn-primary {
+  background: linear-gradient(135deg, var(--arc-gold-500), var(--arc-gold-600));
+  color: #0B0C10;
+  border-radius: 8px;
+  font-weight: 700;
+  transition: all 0.2s ease-in-out;
+}
+
+.premium-btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px var(--arc-gold-glow);
+}
+
+.premium-btn-primary:active {
+  transform: translateY(0);
+}
+
+/* ── Light Mode Color Class Corrections ── */
+html:not(.dark) .text-white {
+  color: var(--arc-text-primary) !important;
+}
+html:not(.dark) .text-slate-300 {
+  color: var(--arc-text-secondary) !important;
+}
+html:not(.dark) .text-slate-200 {
+  color: var(--arc-text-primary) !important;
+}
+html:not(.dark) .text-slate-400 {
+  color: var(--arc-text-secondary) !important;
+}
+html:not(.dark) .text-slate-100 {
+  color: var(--arc-text-primary) !important;
+}
+html:not(.dark) .text-gray-100 {
+  color: var(--arc-text-primary) !important;
+}
+html:not(.dark) .text-gray-200 {
+  color: var(--arc-text-primary) !important;
+}
+html:not(.dark) .text-gray-300 {
+  color: var(--arc-text-secondary) !important;
+}
+
+/* ── High Contrast Study Notes Content ── */
+.topic-notes-content {
+  color: var(--arc-text-primary) !important;
+}
+
+.topic-notes-content h1,
+.topic-notes-content h2,
+.topic-notes-content h3,
+.topic-notes-content h4,
+.topic-notes-content h5,
+.topic-notes-content h6,
+.topic-notes-content strong {
+  color: var(--arc-text-hero) !important;
+  font-weight: 800 !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.topic-notes-content p,
+.topic-notes-content li {
+  color: var(--arc-text-primary) !important;
+  font-weight: 500 !important;
+  line-height: 1.75 !important;
+  margin-bottom: 1rem !important;
+}
+
+.topic-notes-content ul,
+.topic-notes-content ol {
+  padding-left: 1.5rem !important;
+  margin-bottom: 1rem !important;
+}
+
+/* ── Orbit Rotation Animations ── */
+@keyframes spin-slow {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.animate-orbit-1 {
+  animation: spin-slow 80s infinite linear;
+}
+
+.animate-orbit-2 {
+  animation: spin-slow 140s infinite linear;
 }

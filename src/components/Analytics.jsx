@@ -2,188 +2,95 @@ import { useEffect, useState } from "react";
 import supabase from "../lib/supabase";
 
 function Analytics() {
-  const [stats, setStats] =
-    useState({
-      topics: 0,
-      completed: 0,
-      xp: 0,
-      streak: 0,
-    });
+  const [stats, setStats] = useState({
+    topics: 0, completed: 0, xp: 0, streak: 0,
+  });
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
+  useEffect(() => { fetchStats(); }, []);
 
+  // ── All Supabase fetches untouched ──────────────────────────
   const fetchStats = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data: topics } =
-      await supabase
-        .from("topics")
-        .select("*")
-        .eq("user_id", user.id);
-
-    const { data: profile } =
-      await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-    const { data: streak } =
-      await supabase
-        .from("user_streaks")
-        .select("*")
-        .eq("user_id", user.id)
-        .single();
+    const { data: topics }  = await supabase.from("topics").select("*").eq("user_id", user.id);
+    const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+    const { data: streak }  = await supabase.from("user_streaks").select("*").eq("user_id", user.id).single();
 
     setStats({
-      topics:
-        topics?.length || 0,
-      completed:
-        topics?.filter(
-          (t) => t.is_completed
-        ).length || 0,
-      xp:
-        profile?.xp || 0,
-      streak:
-        streak?.streak_count || 0,
+      topics:    topics?.length || 0,
+      completed: topics?.filter((t) => t.is_completed).length || 0,
+      xp:        profile?.xp   || 0,
+      streak:    streak?.streak_count || 0,
     });
   };
 
-return (
-  <div className="bg-white p-6 rounded-3xl shadow-xl mb-6">
-    <h2 className="text-3xl font-black mb-6">
-      📊 Analytics Dashboard
-    </h2>
+  const completionPct = stats.topics === 0 ? 0 : Math.round((stats.completed / stats.topics) * 100);
 
-    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+  const METRICS = [
+    { label: "Total Topics", value: stats.topics,    icon: "📚" },
+    { label: "Completed",    value: stats.completed, icon: "✓"  },
+    { label: "XP Earned",    value: stats.xp,        icon: "⭐" },
+    { label: "Day Streak",   value: stats.streak,    icon: "🔥" },
+  ];
 
-      <div
-        className="
-        bg-gradient-to-r
-        from-blue-500
-        to-cyan-500
-        text-white
-        p-5
-        rounded-2xl
-        shadow-lg
-      "
-      >
-        <p className="text-4xl font-bold">
-          {stats.topics}
-        </p>
-
-        <p className="mt-2">
-          📚 Total Topics
+  return (
+    <div className="arc-card p-6 space-y-6">
+      {/* Header */}
+      <div>
+        <h2 className="arc-font-display text-2xl font-bold arc-text-gradient">
+          📊 Analytics Dashboard
+        </h2>
+        <p className="text-sm mt-1" style={{ color: "var(--arc-text-secondary)" }}>
+          Live telemetry from your study sessions
         </p>
       </div>
 
-      <div
-        className="
-        bg-gradient-to-r
-        from-green-500
-        to-emerald-600
-        text-white
-        p-5
-        rounded-2xl
-        shadow-lg
-      "
-      >
-        <p className="text-4xl font-bold">
-          {stats.completed}
-        </p>
-
-        <p className="mt-2">
-          ✅ Completed
-        </p>
+      {/* Metric grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {METRICS.map(({ label, value, icon }) => (
+          <div
+            key={label}
+            className="arc-card-elevated p-5 flex flex-col gap-3"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-widest"
+                style={{ color: "var(--arc-text-muted)" }}>
+                {label}
+              </span>
+              <span style={{ color: "var(--arc-gold-400)" }}>{icon}</span>
+            </div>
+            <span className="text-3xl font-black" style={{ color: "var(--arc-text-hero)" }}>
+              {value}
+            </span>
+          </div>
+        ))}
       </div>
 
-      <div
-        className="
-        bg-gradient-to-r
-        from-yellow-500
-        to-orange-500
-        text-white
-        p-5
-        rounded-2xl
-        shadow-lg
-      "
-      >
-        <p className="text-4xl font-bold">
-          {stats.xp}
-        </p>
-
-        <p className="mt-2">
-          ⭐ XP Earned
-        </p>
-      </div>
-
-      <div
-        className="
-        bg-gradient-to-r
-        from-violet-500
-        to-purple-700
-        text-white
-        p-5
-        rounded-2xl
-        shadow-lg
-      "
-      >
-        <p className="text-4xl font-bold">
-          {stats.streak}
-        </p>
-
-        <p className="mt-2">
-          🔥 Day Streak
+      {/* Progress overview */}
+      <div>
+        <div className="flex justify-between text-xs mb-2 font-semibold"
+          style={{ color: "var(--arc-text-secondary)" }}>
+          <span>Topic Completion</span>
+          <span style={{ color: "var(--arc-gold-400)" }}>{completionPct}%</span>
+        </div>
+        <div className="w-full h-2 rounded-full overflow-hidden"
+          style={{ background: "rgba(255,255,255,0.05)" }}>
+          <div
+            className="h-full rounded-full transition-all duration-700"
+            style={{
+              width: `${completionPct}%`,
+              background: "linear-gradient(to right, var(--arc-gold-500), var(--arc-gold-400))",
+              boxShadow: "0 0 8px rgba(212,175,55,0.35)",
+            }}
+          />
+        </div>
+        <p className="text-xs mt-2" style={{ color: "var(--arc-text-muted)" }}>
+          {stats.completed} / {stats.topics} topics completed
         </p>
       </div>
-
     </div>
-
-    <div className="mt-8">
-      <h3 className="font-bold text-lg mb-3">
-        Progress Overview
-      </h3>
-
-      <div className="w-full bg-slate-200 rounded-full h-5">
-        <div
-          className="
-          h-5
-          rounded-full
-          bg-gradient-to-r
-          from-green-500
-          to-emerald-600
-          transition-all
-          duration-700
-        "
-          style={{
-            width: `${
-              stats.topics === 0
-                ? 0
-                : (
-                    stats.completed /
-                    stats.topics
-                  ) *
-                  100
-            }%`,
-          }}
-        />
-      </div>
-
-      <p className="mt-2 text-sm text-slate-600">
-        {stats.completed}/
-        {stats.topics}
-        {" "}
-        topics completed
-      </p>
-    </div>
-  </div>
-);
+  );
 }
 
 export default Analytics;

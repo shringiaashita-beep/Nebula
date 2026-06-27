@@ -13,6 +13,7 @@ import {
   generateEliteChallenge,
 } from "../lib/gemini";
 import QuickRevision from "./QuickRevision";
+import ReactMarkdown from "react-markdown";
 function TopicsSection({
   selectedSubject,
 }) {
@@ -30,11 +31,15 @@ const [openMenu, setOpenMenu] =
   useState(null);
 const [bulkGenerating, setBulkGenerating] = useState(false);
 const [questionGeneratingTopicId, setQuestionGeneratingTopicId] = useState(null);
-const [editingTopic, setEditingTopic] =
-  useState(null);
-const [editText, setEditText] =
-  useState("");
 const [selectedTopic, setSelectedTopic] = useState(null);
+const [editingTopic, setEditingTopic] = useState(null);
+const [editText, setEditText] = useState("");
+const [toast, setToast] = useState(null);
+const showToast = (message, type = "info") => {
+  setToast({ message, type });
+  setTimeout(() => setToast(null), 3000);
+};
+const alert = (msg) => showToast(msg, "info");
 useEffect(() => {
   console.log(
     "TOPICS STATE:",
@@ -530,415 +535,313 @@ if (error) {
 fetchTopics();
 };
 
-return ( <div className="bg-white p-6 rounded-2xl shadow mt-8"> <h2 className="text-2xl font-bold mb-4">
-Topic Academy </h2>
+  return (
+    <div className="arc-card p-6 space-y-6 mt-8 relative">
+      {/* Toast Notification */}
+      {toast && (
+        <div
+          className="fixed bottom-5 right-5 z-50 flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all"
+          style={{
+            background: "rgba(212,175,55,0.15)",
+            border: "1px solid rgba(212,175,55,0.4)",
+            color: "var(--arc-gold-400)",
+            backdropFilter: "blur(12px)",
+          }}
+        >
+          {toast.message}
+        </div>
+      )}
 
-  <div className="grid md:grid-cols-3 gap-2 mb-4">
-    <input
-      type="text"
-      placeholder="Subject"
-      value={subjectName}
-      onChange={(e) =>
-        setSubjectName(e.target.value)
-      }
-      className="border p-2 rounded-lg"
-    />
- <input
-    type="text"
-    placeholder="Class / Degree / Semester"
-    value={level}
-    onChange={(e) =>
-      setLevel(e.target.value)
-    }
-    className="border p-2 rounded-lg"
-  />
-
-    <input
-      type="text"
-      placeholder="Topic"
-      value={topicName}
-      onChange={(e) =>
-        setTopicName(e.target.value)
-      }
-      className="border p-2 rounded-lg"
-    />
-
-    <button
-  onClick={addTopic}
-  className={`${button3D} bg-gradient-to-b from-slate-700 to-black`}
->
-  ✨ Add Topic
-    </button>
-    <button
-  onClick={
-    generateAITopics
-  }
-  className={`${button3D} bg-gradient-to-b from-indigo-600 to-indigo-800`}
-  disabled={bulkGenerating}
->
-  Generate AI Topics
-</button>
-  <button
-    onClick={generateNotesForAllTopics}
-    className={`${button3D} bg-gradient-to-b from-indigo-600 to-indigo-800`}
-    disabled={bulkGenerating}
-  >
-    {bulkGenerating
-      ? "Generating Notes..."
-      : "Generate Notes for Topics"}
-  </button>
-  </div>
- <div className="grid grid-cols-3 gap-4 mb-6">
-  <div className="bg-violet-500 text-white p-4 rounded-2xl">
-    <h3 className="text-3xl font-bold">
-      {topics.length}
-    </h3>
-    <p>Total Topics</p>
-  </div>
-
-  <div className="bg-green-500 text-white p-4 rounded-2xl">
-    <h3 className="text-3xl font-bold">
-      {
-        topics.filter(
-          (t) => t.is_completed
-        ).length
-      }
-    </h3>
-    <p>Completed</p>
-  </div>
-
-  <div className="bg-orange-500 text-white p-4 rounded-2xl">
-    <h3 className="text-3xl font-bold">
-      {topics.length}
-    </h3>
-    <p>Active Topics</p>
-  </div>
-</div>
-  {topics.map((topic) => (
-    
-  <div
-    key={topic.id}
-   className="
-bg-white/80
-backdrop-blur-lg
-border
-border-slate-200
-p-6
-rounded-3xl
-mb-4
-shadow-xl
-hover:shadow-2xl
-transition-all
-duration-300
-overflow-visible
-"
->
-    <div className="flex justify-between items-center">
+      {/* Header */}
       <div>
-        <strong>{topic.subject_name}</strong>
-        <p className="text-lg font-semibold text-slate-700 mt-2">
-  {topic.topic_name}
-</p>
-
-        {editingTopic === topic.id ? (
-  <input
-    value={editText}
-    onChange={(e) =>
-      setEditText(
-        e.target.value
-      )
-    }
-    className="border p-1 rounded"
-  />
-) : (
-  <h3 className="text-2xl font-bold text-slate-800">
-  {topic.topic_name}
-</h3>
->
-<p className="text-slate-500 mt-1">
- 📚 {topic.subject_name}
-</p>
-
-)}
-
-        <p>
-          {topic.is_completed
-            ? "🏆 Completed"
-            : "📖 In Progress"}
+        <h2 className="arc-font-display text-2xl font-bold arc-text-gradient">
+          Topic Academy
+        </h2>
+        <p className="text-sm mt-1" style={{ color: "var(--arc-text-secondary)" }}>
+          Organize and manage your topics, generate AI summaries and questions
         </p>
       </div>
 
-    <div className="
-px-4
-py-2
-rounded-xl
-font-semibold
-shadow-md
-hover:scale-105
-transition-all
-">
-   <div className="relative overflow-visible">
+      {/* Inputs Grid */}
+      <div className="grid md:grid-cols-3 gap-3">
+        <input
+          type="text"
+          placeholder="Subject"
+          value={subjectName}
+          onChange={(e) => setSubjectName(e.target.value)}
+          className="arc-input text-sm"
+          style={{ background: "rgba(0,0,0,0.4)" }}
+        />
+        <input
+          type="text"
+          placeholder="Class / Degree / Semester"
+          value={level}
+          onChange={(e) => setLevel(e.target.value)}
+          className="arc-input text-sm"
+          style={{ background: "rgba(0,0,0,0.4)" }}
+        />
+        <input
+          type="text"
+          placeholder="Topic"
+          value={topicName}
+          onChange={(e) => setTopicName(e.target.value)}
+          className="arc-input text-sm"
+          style={{ background: "rgba(0,0,0,0.4)" }}
+        />
+      </div>
 
-  <button
-    onClick={() =>
-      setOpenMenu(
-        openMenu === topic.id
-          ? null
-          : topic.id
-      )
-    }
-   className="
-cursor-pointer
-bg-slate-800
-text-white
-px-4
-py-2
-rounded-xl
-hover:bg-slate-700
-"
-  >
-    ⚡ Actions ▲
-  </button>
-
-  {openMenu === topic.id && (
-    <div
-  className="
-  absolute
-  right-0
-  bottom-full
-  mb-3
-  w-72
-  bg-white
-  rounded-2xl
-  shadow-2xl
-  border
-  z-[9999]
-  overflow-hidden
-  "
->
-      <button
-        onClick={() =>
-          setNotesTopic(topic)
-        }
-        className="w-full text-left p-3 hover:bg-slate-100"
-      >
-        📖 View Notes
-      </button>
-
-      <button
-        onClick={() =>
-          setFlashcardTopic(topic)
-        }
-        className="w-full text-left p-3 hover:bg-slate-100"
-      >
-        🎴 Flashcards
-      </button>
-
-      <button
-        onClick={() =>
-          setMindMapTopic(topic)
-        }
-        className="w-full text-left p-3 hover:bg-slate-100"
-      >
-        🧠 Mind Map
-      </button>
-
-      <button
-        onClick={() =>
-          setRevisionTopic(topic)
-        }
-        className="w-full text-left p-3 hover:bg-slate-100"
-      >
-        ⚡ Quick Revision
-      </button>
-
-      <button
-        onClick={() =>
-          generateHardQuestionsForTopic(
-            topic
-          )
-        }
-        className="w-full text-left p-3 hover:bg-slate-100"
-      >
-        🎯 Generate 30 Hard Questions
-      </button>
-
-      {!topic.is_completed && (
+      {/* Actions/Buttons bar */}
+      <div className="flex flex-wrap gap-2.5">
         <button
-          onClick={() =>
-            setSelectedTopic(topic)
-          }
-          className="w-full text-left p-3 hover:bg-slate-100"
+          onClick={addTopic}
+          className="arc-btn-gold px-5 py-2.5 text-sm rounded-xl font-bold"
         >
-          🏆 Take Challenge
+          ✨ Add Topic
         </button>
+        <button
+          onClick={generateAITopics}
+          className="arc-btn-ghost px-5 py-2.5 text-sm rounded-xl font-bold"
+          disabled={bulkGenerating}
+        >
+          Generate AI Topics
+        </button>
+        <button
+          onClick={generateNotesForAllTopics}
+          className="arc-btn-ghost px-5 py-2.5 text-sm rounded-xl font-bold"
+          disabled={bulkGenerating}
+        >
+          {bulkGenerating ? "Generating Notes..." : "Generate Notes for Topics"}
+        </button>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: "Total Topics", value: topics.length, icon: "📚" },
+          { label: "Completed", value: topics.filter((t) => t.is_completed).length, icon: "🏆" },
+          { label: "Active Topics", value: topics.filter((t) => !t.is_completed).length, icon: "🔥" },
+        ].map(({ label, value, icon }) => (
+          <div key={label} className="arc-card-elevated px-4 py-3 flex flex-col gap-1">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--arc-text-muted)" }}>{label}</span>
+              <span style={{ color: "var(--arc-gold-400)" }}>{icon}</span>
+            </div>
+            <span className="text-2xl font-black mt-1" style={{ color: "var(--arc-text-hero)" }}>
+              {value}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Topics List */}
+      <div className="space-y-4">
+        {topics.map((topic) => (
+          <div
+            key={topic.id}
+            className="p-5 rounded-xl transition-all relative overflow-visible"
+            style={{
+              background: "var(--arc-bg-elevated)",
+              border: "1px solid var(--arc-border)",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.2)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--arc-border)"; }}
+          >
+            <div className="flex justify-between items-start">
+              <div className="space-y-1">
+                <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--arc-text-muted)" }}>
+                  {topic.subject_name}
+                </span>
+
+                {editingTopic === topic.id ? (
+                  <div className="flex gap-2 items-center mt-1">
+                    <input
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      className="arc-input text-sm"
+                      style={{ background: "rgba(0,0,0,0.4)" }}
+                    />
+                    <button onClick={() => updateTopic(topic.id)} className="arc-btn-gold px-3 py-1.5 text-xs rounded-lg">Save</button>
+                    <button onClick={() => setEditingTopic(null)} className="arc-btn-ghost px-3 py-1.5 text-xs rounded-lg">Cancel</button>
+                  </div>
+                ) : (
+                  <h3 className="arc-font-display text-lg font-bold" style={{ color: "var(--arc-text-primary)" }}>
+                    {topic.topic_name}
+                  </h3>
+                )}
+
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-xs font-semibold" style={{ color: topic.is_completed ? "var(--arc-success)" : "var(--arc-gold-400)" }}>
+                    {topic.is_completed ? "🏆 Completed" : "📖 In Progress"}
+                  </span>
+                  {questionGeneratingTopicId === topic.id && (
+                    <span className="text-xs animate-pulse" style={{ color: "var(--arc-gold-400)" }}>
+                      ⚡ Generating questions...
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Actions button & dropdown menu */}
+              <div className="relative">
+                <button
+                  onClick={() => setOpenMenu(openMenu === topic.id ? null : topic.id)}
+                  className="arc-btn-ghost px-3 py-1.5 text-xs rounded-lg flex items-center gap-1"
+                >
+                  ⚡ Actions {openMenu === topic.id ? "▲" : "▼"}
+                </button>
+
+                {openMenu === topic.id && (
+                  <div
+                    className="absolute right-0 top-full mt-2 w-64 rounded-xl shadow-2xl z-[9999] overflow-hidden"
+                    style={{
+                      background: "var(--arc-bg-elevated)",
+                      border: "1px solid var(--arc-border)",
+                      boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+                    }}
+                  >
+                    <div className="py-1">
+                      {[
+                        { label: "📖 View Notes", action: () => setNotesTopic(topic) },
+                        { label: "🎴 Flashcards", action: () => setFlashcardTopic(topic) },
+                        { label: "🧠 Mind Map", action: () => setMindMapTopic(topic) },
+                        { label: "⚡ Quick Revision", action: () => setRevisionTopic(topic) },
+                        { label: "🎯 Generate 30 Hard Questions", action: () => generateHardQuestionsForTopic(topic) },
+                      ].map((item) => (
+                        <button
+                          key={item.label}
+                          onClick={() => { item.action(); setOpenMenu(null); }}
+                          className="w-full text-left px-4 py-2.5 text-xs font-medium transition-all hover:bg-white/5"
+                          style={{ color: "var(--arc-text-primary)" }}
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+
+                      {!topic.is_completed && (
+                        <button
+                          onClick={() => { setSelectedTopic(topic); setOpenMenu(null); }}
+                          className="w-full text-left px-4 py-2.5 text-xs font-medium transition-all hover:bg-white/5"
+                          style={{ color: "var(--arc-gold-400)" }}
+                        >
+                          🏆 Take Challenge
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => { setEditingTopic(topic.id); setEditText(topic.topic_name); setOpenMenu(null); }}
+                        className="w-full text-left px-4 py-2.5 text-xs font-medium transition-all hover:bg-white/5"
+                        style={{ color: "var(--arc-text-secondary)" }}
+                      >
+                        ✏️ Edit Name
+                      </button>
+
+                      <button
+                        onClick={() => { deleteTopic(topic.id); setOpenMenu(null); }}
+                        className="w-full text-left px-4 py-2.5 text-xs font-medium transition-all hover:bg-red-500/10"
+                        style={{ color: "var(--arc-error)" }}
+                      >
+                        🗑 Delete
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Child Components if open */}
+            <div className="mt-4">
+              {notesTopic?.id === topic.id && (
+                <TopicNotes subject={topic.subject_name} topic={topic.topic_name} />
+              )}
+              {flashcardTopic?.id === topic.id && (
+                <Flashcards subject={topic.subject_name} topic={topic.topic_name} />
+              )}
+              {mindMapTopic?.id === topic.id && (
+                <MindMap subject={topic.subject_name} topic={topic.topic_name} />
+              )}
+              {revisionTopic?.id === topic.id && (
+                <QuickRevision subject={topic.subject_name} topic={topic.topic_name} />
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {selectedTopic && (
+        <EliteChallenge
+          subject={selectedTopic.subject_name}
+          topic={selectedTopic.topic_name}
+          onPass={async () => {
+            const {
+              data: { user },
+            } = await supabase.auth.getUser();
+
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("*")
+              .eq("id", user.id)
+              .single();
+
+            const { data: existingBadge } = await supabase
+              .from("user_badges")
+              .select("*")
+              .eq("user_id", user.id)
+              .eq("badge_name", "First Victory")
+              .maybeSingle();
+
+            if (!existingBadge) {
+              await supabase.from("user_badges").insert([
+                {
+                  user_id: user.id,
+                  badge_name: "First Victory",
+                },
+              ]);
+            }
+
+            const currentXP = profile?.xp || 0;
+            const newXP = currentXP + 50;
+            let newLevel = 1;
+
+            if (newXP >= 1000)      newLevel = 5;
+            else if (newXP >= 500) newLevel = 4;
+            else if (newXP >= 250) newLevel = 3;
+            else if (newXP >= 100) newLevel = 2;
+
+            await supabase
+              .from("profiles")
+              .update({
+                xp: newXP,
+                level: newLevel,
+              })
+              .eq("id", user.id);
+
+            const today = new Date().toISOString().split("T")[0];
+            const { data: streak } = await supabase
+              .from("user_streaks")
+              .select("*")
+              .eq("user_id", user.id)
+              .maybeSingle();
+
+            if (streak) {
+              if (streak.last_study_date !== today) {
+                await supabase
+                  .from("user_streaks")
+                  .update({
+                    streak_count: (streak.streak_count || 0) + 1,
+                    last_study_date: today,
+                  })
+                  .eq("user_id", user.id);
+              }
+            }
+
+            await completeTopic(selectedTopic.id, false);
+            setSelectedTopic(null);
+            showToast(`🏆 Topic Mastered! +50 XP · Level ${newLevel}`, "success");
+          }}
+        />
       )}
-
-      <button
-        onClick={() =>
-          deleteTopic(topic.id)
-        }
-        className="w-full text-left p-3 hover:bg-red-50 text-red-600"
-      >
-        🗑 Delete
-      </button>
-
     </div>
-  )}
-
-</div>    
- 
-   <span
-  className="
-  bg-gradient-to-r
-  from-yellow-400
-  via-amber-500
-  to-orange-500
-  text-white
-  px-5
-  py-2
-  rounded-full
-  shadow-lg
-  font-bold
-  "
->
-  🏆 Mastered
-</span>
-  
-</div>
-    </div>
-
-   {notesTopic?.id === topic.id && (
-  <TopicNotes
-    subject={topic.subject_name}
-    topic={topic.topic_name}
-  />
-)}
-
-{flashcardTopic?.id === topic.id && (
-  <Flashcards
-    subject={topic.subject_name}
-    topic={topic.topic_name}
-  />
-)}
-  {mindMapTopic?.id === topic.id && (
-  <MindMap
-    subject={topic.subject_name}
-    topic={topic.topic_name}
-  />
-)}
-{revisionTopic?.id === topic.id && (
-  <QuickRevision
-    subject={topic.subject_name}
-    topic={topic.topic_name}
-  />
-)}
-  </div>
-))}
-
-
-  {selectedTopic && (
-   <EliteChallenge
-  subject={selectedTopic.subject_name}
-  topic={selectedTopic.topic_name}
-  onPass={async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    const { data: profile } =
-      await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-        const { data: existingBadge } =
-  await supabase
-    .from("user_badges")
-    .select("*")
-    .eq("user_id", user.id)
-    .eq(
-      "badge_name",
-      "First Victory"
-    )
-    .single();
-
-if (!existingBadge) {
-  await supabase
-    .from("user_badges")
-    .insert([
-      {
-        user_id: user.id,
-        badge_name:
-          "First Victory",
-      },
-    ]);
-}
-  const currentXP =
-      profile?.xp || 0;
-
-    const newXP =
-      currentXP + 50;
-
-    let newLevel = 1;
-
-    if (newXP >= 1000)
-      newLevel = 5;
-    else if (newXP >= 500)
-      newLevel = 4;
-    else if (newXP >= 250)
-      newLevel = 3;
-    else if (newXP >= 100)
-      newLevel = 2;
-
-    await supabase
-      .from("profiles")
-      .update({
-        xp: newXP,
-        level: newLevel,
-      })
-      .eq("id", user.id);
-      const today = new Date()
-  .toISOString()
-  .split("T")[0];
-
-const { data: streak } =
-  await supabase
-    .from("user_streaks")
-    .select("*")
-    .eq("user_id", user.id)
-    .single();
-
-if (streak) {
-  if (
-    streak.last_study_date !== today
-  ) {
-    await supabase
-      .from("user_streaks")
-      .update({
-        streak_count:
-          (streak.streak_count || 0) + 1,
-        last_study_date: today,
-      })
-      .eq("user_id", user.id);
-  }
-}
-
-    await completeTopic(
-      selectedTopic.id,
-      false
-    );
-
-    setSelectedTopic(null);
-
-    alert(
-      `🏆 Topic Mastered!\n+50 XP\nLevel ${newLevel}`
-    );
-  }}
-/>
-  )}
-</div>
-);
+  );
 }
 
 export default TopicsSection;

@@ -9,11 +9,15 @@ function QuestionBank() {
   const [optionB, setOptionB] = useState("");
   const [optionC, setOptionC] = useState("");
   const [optionD, setOptionD] = useState("");
-  const [correctAnswer, setCorrectAnswer] =
-    useState("");
+  const [correctAnswer, setCorrectAnswer] = useState("");
 
-  const [questions, setQuestions] =
-    useState([]);
+  const [questions, setQuestions] = useState([]);
+  const [infoMsg, setInfoMsg] = useState("");
+
+  const showInfo = (msg) => {
+    setInfoMsg(msg);
+    setTimeout(() => setInfoMsg(""), 3000);
+  };
 
   useEffect(() => {
     fetchQuestions();
@@ -31,6 +35,11 @@ function QuestionBank() {
   };
 
   const addQuestion = async () => {
+    if (!subject.trim() || !topic.trim() || !question.trim() || !optionA.trim() || !optionB.trim() || !optionC.trim() || !optionD.trim() || !correctAnswer.trim()) {
+      showInfo("⚠️ Please fill all fields before adding a question.");
+      return;
+    }
+
     const { error } = await supabase
       .from("question_bank")
       .insert([
@@ -47,11 +56,11 @@ function QuestionBank() {
       ]);
 
     if (error) {
-      alert(error.message);
+      showInfo("⚠️ " + error.message);
       return;
     }
 
-    alert("Question Added");
+    showInfo("✓ Question Added successfully!");
 
     setSubject("");
     setTopic("");
@@ -66,168 +75,121 @@ function QuestionBank() {
   };
 
   return (
-    <div
-  className="
-  bg-gradient-to-br
-  from-white
-  to-blue-50
-  p-8
-  rounded-3xl
-  shadow-2xl
-  mt-8
-  border
-  border-blue-100
-"
->
-  <h2 className="text-4xl font-black mb-2">
-  🧠 Question Bank
-</h2>
+    <div className="arc-card p-6 space-y-6 mt-8">
+      {/* Toast message */}
+      {infoMsg && (
+        <div className="arc-alert-success">
+          <span>✓</span><span>{infoMsg}</span>
+        </div>
+      )}
 
-<p className="text-slate-500 mb-6">
-  Create and manage practice questions
-</p>
-<div className="grid md:grid-cols-3 gap-4 mb-6">
+      {/* Header */}
+      <div>
+        <h2 className="arc-font-display text-2xl font-bold arc-text-gradient">
+          🧠 Question Bank
+        </h2>
+        <p className="text-sm mt-1" style={{ color: "var(--arc-text-secondary)" }}>
+          Create and manage practice questions
+        </p>
+      </div>
 
-  <div className="bg-blue-500 text-white p-4 rounded-2xl shadow-lg">
-    <h3 className="text-3xl font-bold">
-      {questions.length}
-    </h3>
-    <p>Total Questions</p>
-  </div>
+      {/* Stats row */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: "Total Questions", value: questions.length, icon: "📚" },
+          { label: "Practice Mode",   value: "Active",         icon: "📝" },
+          { label: "Creator Tier",    value: "Standard",       icon: "🎯" },
+        ].map(({ label, value, icon }) => (
+          <div
+            key={label}
+            className="arc-card-elevated px-4 py-3 flex flex-col gap-1"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--arc-text-muted)" }}>{label}</span>
+              <span style={{ color: "var(--arc-gold-400)" }}>{icon}</span>
+            </div>
+            <span className="text-xl font-black mt-1" style={{ color: "var(--arc-text-hero)" }}>
+              {value}
+            </span>
+          </div>
+        ))}
+      </div>
 
-  <div className="bg-green-500 text-white p-4 rounded-2xl shadow-lg">
-    <h3 className="text-3xl font-bold">
-      📝
-    </h3>
-    <p>Practice Mode</p>
-  </div>
+      {/* Question Form */}
+      <div className="space-y-4">
+        <div className="grid sm:grid-cols-2 gap-3">
+          <input
+            placeholder="Subject (e.g. Physics)"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            className="arc-input text-sm"
+            style={{ background: "rgba(0,0,0,0.4)" }}
+          />
 
-  <div className="bg-violet-500 text-white p-4 rounded-2xl shadow-lg">
-    <h3 className="text-3xl font-bold">
-      🎯
-    </h3>
-    <p>Question Creator</p>
-  </div>
-
-</div>
-
-      <div className="grid gap-4">
-        <input
-          placeholder="Subject"
-          value={subject}
-          onChange={(e) =>
-            setSubject(e.target.value)
-          }
-          className="
-p-4
-rounded-2xl
-border-2
-border-slate-200
-focus:outline-none
-focus:border-violet-500
-"
-        />
-
-        <input
-          placeholder="Topic"
-          value={topic}
-          onChange={(e) =>
-            setTopic(e.target.value)
-          }
-          className="
-p-4
-rounded-2xl
-border-2
-border-slate-200
-focus:outline-none
-focus:border-violet-500
-"
-        />
+          <input
+            placeholder="Topic (e.g. Thermodynamics)"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            className="arc-input text-sm"
+            style={{ background: "rgba(0,0,0,0.4)" }}
+          />
+        </div>
 
         <textarea
-          placeholder="Question"
+          placeholder="Question text"
           value={question}
-          onChange={(e) =>
-            setQuestion(e.target.value)
-          }
-          className="
-p-4
-rounded-2xl
-border-2
-border-slate-200
-focus:outline-none
-focus:border-violet-500
-"
+          onChange={(e) => setQuestion(e.target.value)}
+          rows="3"
+          className="arc-input text-sm w-full"
+          style={{ background: "rgba(0,0,0,0.4)" }}
         />
 
-        <input
-          placeholder="Option A"
-          value={optionA}
-          onChange={(e) =>
-            setOptionA(e.target.value)
-          }
-          className="
-p-4
-rounded-2xl
-border-2
-border-slate-200
-focus:outline-none
-focus:border-violet-500
-"       
-        />
+        <div className="grid sm:grid-cols-2 gap-3">
+          <input
+            placeholder="Option A"
+            value={optionA}
+            onChange={(e) => setOptionA(e.target.value)}
+            className="arc-input text-sm"
+            style={{ background: "rgba(0,0,0,0.4)" }}
+          />
+
+          <input
+            placeholder="Option B"
+            value={optionB}
+            onChange={(e) => setOptionB(e.target.value)}
+            className="arc-input text-sm"
+            style={{ background: "rgba(0,0,0,0.4)" }}
+          />
+
+          <input
+            placeholder="Option C"
+            value={optionC}
+            onChange={(e) => setOptionC(e.target.value)}
+            className="arc-input text-sm"
+            style={{ background: "rgba(0,0,0,0.4)" }}
+          />
+
+          <input
+            placeholder="Option D"
+            value={optionD}
+            onChange={(e) => setOptionD(e.target.value)}
+            className="arc-input text-sm"
+            style={{ background: "rgba(0,0,0,0.4)" }}
+          />
+        </div>
 
         <input
-          placeholder="Option B"
-          value={optionB}
-          onChange={(e) =>
-            setOptionB(e.target.value)
-          }
-          className="border p-2 rounded"
-        />
-
-        <input
-          placeholder="Option C"
-          value={optionC}
-          onChange={(e) =>
-            setOptionC(e.target.value)
-          }
-          className="border p-2 rounded"
-        />
-
-        <input
-          placeholder="Option D"
-          value={optionD}
-          onChange={(e) =>
-            setOptionD(e.target.value)
-          }
-          className="border p-2 rounded"
-        />
-
-        <input
-          placeholder="Correct Answer"
+          placeholder="Correct Answer (e.g. A, B, C, or D)"
           value={correctAnswer}
-          onChange={(e) =>
-            setCorrectAnswer(
-              e.target.value
-            )
-          }
-          className="border p-2 rounded"
+          onChange={(e) => setCorrectAnswer(e.target.value)}
+          className="arc-input text-sm"
+          style={{ background: "rgba(0,0,0,0.4)" }}
         />
 
         <button
           onClick={addQuestion}
-        className="
-bg-gradient-to-r
-from-violet-600
-to-purple-700
-text-white
-py-4
-rounded-2xl
-font-bold
-shadow-lg
-hover:scale-105
-transition-all
-"       >
+          className="arc-btn-gold w-full py-3 text-sm font-bold rounded-xl"
+        >
           Add Question
         </button>
       </div>

@@ -1,126 +1,117 @@
 import { useEffect, useState } from "react";
 import supabase from "../lib/supabase";
 import { generateFlashcards } from "../lib/gemini";
-function Flashcards({
-  subject,
-  topic,
-}) {
-  const [cards, setCards] =
-    useState([]);
 
-  const [current, setCurrent] =
-    useState(0);
-
-  const [showAnswer, setShowAnswer] =
-    useState(false);
+function Flashcards({ subject, topic }) {
+  const [cards, setCards] = useState([]);
+  const [current, setCurrent] = useState(0);
+  const [showAnswer, setShowAnswer] = useState(false);
 
   useEffect(() => {
     fetchCards();
   }, []);
 
   const fetchCards = async () => {
-  const { data, error } =
-    await supabase
+    const { data, error } = await supabase
       .from("flashcards")
       .select("*")
-      .eq(
-        "subject_name",
-        subject
-      )
-      .eq(
-        "topic_name",
-        topic
-      );
+      .eq("subject_name", subject)
+      .eq("topic_name", topic);
 
-  if (
-    !error &&
-    data &&
-    data.length > 0
-  ) {
-    setCards(data);
-    return;
-  }
+    if (!error && data && data.length > 0) {
+      setCards(data);
+      return;
+    }
 
-  try {
-    const aiCards =
-      await generateFlashcards(
-        subject,
-        topic
-      );
+    try {
+      const aiCards = await generateFlashcards(subject, topic);
+      const rows = aiCards.map((card) => ({
+        subject_name: subject,
+        topic_name: topic,
+        question: card.question,
+        answer: card.answer,
+      }));
 
-    const rows = aiCards.map(
-      (card) => ({
-        subject_name:
-          subject,
-        topic_name:
-          topic,
-        question:
-          card.question,
-        answer:
-          card.answer,
-      })
-    );
+      await supabase.from("flashcards").insert(rows);
+      setCards(rows);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-    await supabase
-      .from("flashcards")
-      .insert(rows);
-
-    setCards(rows);
-  } catch (err) {
-    console.log(err);
-  }
-};
   if (cards.length === 0) {
     return (
-      <div className="mt-4">
+      <div className="mt-4 text-sm" style={{ color: "var(--arc-text-secondary)" }}>
         No Flashcards Found
       </div>
     );
   }
 
+  // Helper to render point-wise flashcard answers
+  const renderAnswer = (answerText) => {
+    const lines = answerText
+      .split("\n")
+      .map((line) => line.replace(/^[•\-\*\s]+/, "").trim())
+      .filter((line) => line.length > 0);
+
+    if (lines.length > 1) {
+      return (
+        <ul className="list-disc pl-5 mt-3 space-y-1 text-sm leading-relaxed" style={{ color: "var(--arc-text-secondary)" }}>
+          {lines.map((line, idx) => (
+            <li key={idx}>{line}</li>
+          ))}
+        </ul>
+      );
+    }
+
+    return (
+      <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--arc-text-secondary)" }}>
+        {answerText}
+      </p>
+    );
+  };
+
   return (
-    <div className="bg-blue-50 border p-4 rounded-lg mt-4">
-      <h3 className="font-bold text-xl mb-4">
-        🃏 Flashcards
+    <div
+      className="border p-6 rounded-2xl mt-4"
+      style={{
+        background: "var(--arc-bg-surface)",
+        borderColor: "var(--arc-border)",
+        color: "var(--arc-text-primary)"
+      }}
+    >
+      <h3 className="font-bold text-lg mb-4" style={{ color: "var(--arc-text-hero)" }}>
+        🃏 Flashcard Review
       </h3>
 
-      <p className="font-semibold">
-        {cards[current].question}
-      </p>
-
-      {showAnswer && (
-        <p className="mt-3">
-          {cards[current].answer}
+      <div
+        className="p-5 rounded-xl border mb-4"
+        style={{
+          background: "rgba(0,0,0,0.25)",
+          borderColor: "var(--arc-border)"
+        }}
+      >
+        <p className="font-semibold text-base" style={{ color: "var(--arc-text-primary)" }}>
+          Q: {cards[current].question}
         </p>
-      )}
 
-      <div className="flex gap-2 mt-4">
+        {showAnswer && renderAnswer(cards[current].answer)}
+      </div>
+
+      <div className="flex gap-2">
         <button
-          onClick={() =>
-            setShowAnswer(
-              !showAnswer
-            )
-          }
-          className="bg-black text-white px-3 py-1 rounded"
+          onClick={() => setShowAnswer(!showAnswer)}
+          className="arc-btn-gold px-4 py-2 text-xs rounded-lg font-bold"
         >
-          {showAnswer
-            ? "Hide Answer"
-            : "Show Answer"}
+          {showAnswer ? "Hide Answer" : "Show Answer"}
         </button>
 
         <button
           onClick={() => {
-            setCurrent(
-              (prev) =>
-                (prev + 1) %
-                cards.length
-            );
-
-            setShowAnswer(
-              false
-            );
+            setCurrent((prev) => (prev + 1) % cards.length);
+            setShowAnswer(false);
           }}
-          className="bg-green-600 text-white px-3 py-1 rounded"
+          className="arc-btn-ghost px-4 py-2 text-xs rounded-lg font-bold"
         >
           Next Card
         </button>

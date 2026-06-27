@@ -5,14 +5,9 @@ function QuickRevision({
   subject,
   topic,
 }) {
-  const [data, setData] =
-    useState(null);
-
-  const [loading, setLoading] =
-    useState(true);
-
-  const [error, setError] =
-    useState(null);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadRevision();
@@ -22,18 +17,12 @@ function QuickRevision({
     try {
       setLoading(true);
 
-      const result =
-        await generateRevisionPack(
-          subject,
-          topic
-        );
+      const result = await generateRevisionPack(subject, topic);
 
       setData(result);
     } catch (err) {
       console.log(err);
-      setError(
-        "Failed to generate revision pack."
-      );
+      setError("Failed to generate revision pack.");
     } finally {
       setLoading(false);
     }

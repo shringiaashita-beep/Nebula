@@ -5,6 +5,12 @@ function StudyPlanSection() {
   const [hoursPerDay, setHoursPerDay] = useState(4);
   const [studyPlan, setStudyPlan] = useState([]);
   const [savedPlans, setSavedPlans] = useState([]);
+  const [infoMsg, setInfoMsg] = useState("");
+
+  const showInfo = (msg) => {
+    setInfoMsg(msg);
+    setTimeout(() => setInfoMsg(""), 3000);
+  };
 
   useEffect(() => {
     fetchSavedPlans();
@@ -114,8 +120,7 @@ function StudyPlanSection() {
     );
 
     setStudyPlan(generated);
-
-    alert("Plan Generated!");
+    showInfo("✓ Plan generated successfully!");
   };
 
   const savePlan = async () => {
@@ -126,7 +131,7 @@ function StudyPlanSection() {
     if (!user) return;
 
     if (studyPlan.length === 0) {
-      alert("Generate a plan first");
+      showInfo("Generate a plan first.");
       return;
     }
 
@@ -149,8 +154,7 @@ function StudyPlanSection() {
       }
     }
 
-    alert("Plan Saved!");
-
+    showInfo("✓ Plan saved!");
     fetchSavedPlans();
   };
 
@@ -162,10 +166,7 @@ function StudyPlanSection() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    alert("User not found");
-    return;
-  }
+  if (!user) { showInfo("User not found."); return; }
 
   const { error } = await supabase
     .from("study_plans")
@@ -174,10 +175,7 @@ function StudyPlanSection() {
     })
     .eq("id", id);
 
-  if (error) {
-    alert(error.message);
-    return;
-  }
+  if (error) { showInfo(error.message); return; }
 
   if (!currentValue) {
     const today = new Date();
@@ -216,9 +214,7 @@ function StudyPlanSection() {
       sessionError
     );
 
-    if (sessionError) {
-      alert(sessionError.message);
-    }
+    if (sessionError) { showInfo(sessionError.message); }
   }
 
   fetchSavedPlans();
@@ -265,271 +261,160 @@ function StudyPlanSection() {
     : null;
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow mt-8">
-      <div className="grid md:grid-cols-4 gap-4 mb-6">
-  <div className="bg-blue-500 text-white p-4 rounded-2xl shadow-lg">
-    <h3 className="text-3xl font-bold">
-      {studyPlan.length}
-    </h3>
-    <p>📚 Exams</p>
-  </div>
+    <div className="space-y-6">
 
-  <div className="bg-orange-500 text-white p-4 rounded-2xl shadow-lg">
-    <h3 className="text-3xl font-bold">
-      {closestExam}
-    </h3>
-    <p>⏳ Days Left</p>
-  </div>
+      {/* Info toast */}
+      {infoMsg && (
+        <div className="arc-alert-success">
+          <span>✓</span><span>{infoMsg}</span>
+        </div>
+      )}
 
-  <div className="bg-green-500 text-white p-4 rounded-2xl shadow-lg">
-    <h3 className="text-3xl font-bold">
-      {completedCount}
-    </h3>
-    <p>🔥 Completed</p>
-  </div>
+      {/* ── Planner header ──────────────────────────────── */}
+      <div className="arc-card p-6 space-y-5" style={{ borderTop: "2px solid var(--arc-gold-500)" }}>
+        <div>
+          <h2 className="arc-font-display text-2xl font-bold arc-text-gradient">⚡ Smart AI Study Planner</h2>
+          <p className="text-sm mt-1" style={{ color: "var(--arc-text-secondary)" }}>Generate a personalised plan based on your exam schedule</p>
+        </div>
 
-  <div className="bg-purple-500 text-white p-4 rounded-2xl shadow-lg">
-    <h3 className="text-3xl font-bold">
-      {progress}%
-    </h3>
-    <p>⭐ Progress</p>
-  </div>
-</div>
-      <h2 className="text-2xl font-bold mb-4">
-        Smart AI Study Planner
-      </h2>
+        {/* Stats row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { label: "Exams",     value: studyPlan.length, icon: "📚" },
+            { label: "Days Left", value: closestExam,       icon: "⏳" },
+            { label: "Completed", value: completedCount,    icon: "🔥" },
+            { label: "Progress",  value: `${progress}%`,   icon: "⭐" },
+          ].map(({ label, value, icon }) => (
+            <div key={label} className="arc-card-elevated p-4 flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--arc-text-muted)" }}>{label}</span>
+                <span style={{ color: "var(--arc-gold-400)" }}>{icon}</span>
+              </div>
+              <span className="text-2xl font-black" style={{ color: "var(--arc-text-hero)" }}>{value}</span>
+            </div>
+          ))}
+        </div>
 
-      <input
-        type="number"
-        min="1"
-        value={hoursPerDay}
-        onChange={(e) =>
-          setHoursPerDay(
-            Number(e.target.value)
-          )
-        }
-        className="border p-2 rounded-lg w-full mb-4"
-      />
+        {/* Hours input + actions */}
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-semibold" style={{ color: "var(--arc-text-secondary)" }}>Hours/Day</label>
+            <input
+              type="number" min="1"
+              value={hoursPerDay}
+              onChange={(e) => setHoursPerDay(Number(e.target.value))}
+              className="arc-input w-20 text-center text-sm"
+              style={{ background: "rgba(0,0,0,0.4)" }}
+            />
+          </div>
+          <div className="flex gap-2">
+            <button onClick={generatePlan} className="arc-btn-gold px-5 py-2.5 text-sm rounded-xl">Generate Plan</button>
+            <button onClick={savePlan}     className="arc-btn-ghost px-5 py-2.5 text-sm rounded-xl">Save Plan</button>
+          </div>
+        </div>
 
-      <div className="flex gap-2 mb-6">
-        <button
-          onClick={generatePlan}
-         className="
-bg-gradient-to-r
-from-violet-600
-to-purple-600
-text-white
-px-8
-py-3
-rounded-xl
-shadow-lg
-hover:scale-105
-transition-all
-"                                                                                          
-        > 
-          Generate Plan
-        </button>
-
-        <button
-          onClick={savePlan}
-          className="
-bg-gradient-to-r
-from-green-500
-to-emerald-600
-text-white
-px-8
-py-3
-rounded-xl
-shadow-lg
-hover:scale-105
-transition-all
-"
-        >
-          Save Plan
-        </button>
+        {/* Progress bar */}
+        <div>
+          <div className="flex justify-between text-xs mb-1.5 font-medium" style={{ color: "var(--arc-text-secondary)" }}>
+            <span>Overall Completion</span>
+            <span style={{ color: "var(--arc-gold-400)" }}>{progress}%  — {completedCount}/{savedPlans.length} plans</span>
+          </div>
+          <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>
+            <div className="h-full rounded-full transition-all duration-500"
+              style={{ width: `${progress}%`, background: "linear-gradient(to right, var(--arc-gold-500), var(--arc-gold-400))" }} />
+          </div>
+        </div>
       </div>
+
+      {/* ── Today's Mission ─────────────────────────────── */}
       {todayMission && (
-  <div className="bg-gradient-to-r from-violet-500 to-purple-600 text-white p-6 rounded-2xl shadow-xl mb-6">
-    <h3 className="text-2xl font-bold mb-3">
-      🎯 Today's Mission
-    </h3>
+        <div className="arc-card p-5" style={{ border: "1px solid rgba(212,175,55,0.3)", background: "rgba(212,175,55,0.05)" }}>
+          <h3 className="arc-font-display text-lg font-bold arc-text-gold mb-3">🎯 Today's Mission</h3>
+          <div className="grid sm:grid-cols-2 gap-2 text-sm">
+            {[
+              ["📚 Subject", todayMission.subject],
+              ["⏳ Study", `${todayMission.studyHours}h today`],
+              ["🔥 Priority", todayMission.priority],
+              ["🚀 Reward", "+50 XP"],
+            ].map(([k, v]) => (
+              <div key={k} className="flex items-center gap-2">
+                <span style={{ color: "var(--arc-text-muted)" }}>{k}:</span>
+                <span className="font-semibold" style={{ color: "var(--arc-text-primary)" }}>{v}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
-    <div className="space-y-2">
-      <p>
-        📚 Subject:
-        {" "}
-        {todayMission.subject}
-      </p>
-
-      <p>
-        ⏳ Study:
-        {" "}
-        {todayMission.studyHours}
-        h today
-      </p>
-
-      <p>
-        🔥 Priority:
-        {" "}
-        {todayMission.priority}
-      </p>
-
-      <p>
-        🚀 Reward:
-        +50 XP
-      </p>
-    </div>
-  </div>
-)}
-
-      <div className="border-l-8 border-blue-500 bg-blue-50 p-4 rounded-xl mb-3 shadow">
-        <h3 className="font-bold mb-2">
-  Progress: {progress}%
-</h3>
-
-<div className="w-full bg-slate-200 rounded-full h-4 mb-3">
-  <div
-    className="h-4 rounded-full bg-green-500 transition-all duration-500"
-    style={{
-      width: `${progress}%`,
-    }}
-  />
-</div>
-
-<p>
-  ✅ Completed: {completedCount}/
-  {savedPlans.length}
-</p>
-      </div>
-
+      {/* ── Generated Plan ──────────────────────────────── */}
       {studyPlan.length > 0 && (
-        <div className="mb-8">
-          <h3 className="text-xl font-bold mb-4">
-            Generated Plan
-          </h3>
+        <div className="arc-card p-6 space-y-4">
+          <h3 className="arc-font-display text-lg font-bold arc-text-gradient">Generated Plan</h3>
+          {studyPlan.map((item, index) => {
+            const urgencyColor = item.daysLeft <= 3 ? "var(--arc-error)" : item.daysLeft <= 7 ? "var(--arc-gold-400)" : "var(--arc-success)";
+            const urgencyLabel = item.daysLeft <= 3 ? "🚨 Critical" : item.daysLeft <= 7 ? "⚠️ Moderate" : "✅ Safe";
+            const fillPct = Math.max(10, 100 - item.daysLeft * 5);
+            return (
+              <div key={index} className="arc-card-elevated p-5 space-y-3"
+                style={{ borderLeft: `3px solid ${urgencyColor}` }}>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h4 className="font-bold text-base" style={{ color: "var(--arc-text-primary)" }}>📚 {item.subject}</h4>
+                    <p className="text-xs mt-0.5" style={{ color: "var(--arc-text-muted)" }}>⏳ {item.daysLeft} days left · 🎯 {item.studyHours}h/day</p>
+                  </div>
+                  <span className="text-xs font-bold" style={{ color: urgencyColor }}>{urgencyLabel}</span>
+                </div>
+                <div className="w-full h-1.5 rounded-full" style={{ background: "rgba(255,255,255,0.05)" }}>
+                  <div className="h-full rounded-full transition-all"
+                    style={{ width: `${fillPct}%`, background: `linear-gradient(to right, ${urgencyColor}, ${urgencyColor}88)` }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
-          {studyPlan.map((item, index) => (
-            <div
-  key={index}
-  className="
-  bg-gradient-to-r
-  from-blue-50
-  to-purple-50
-  border-l-8
-  border-violet-500
-  p-5
-  rounded-2xl
-  shadow-lg
-  mb-4
-"
->
-             <h3 className="text-2xl font-bold mb-2">
-  📚 {item.subject}
-</h3>
-
-<p className="text-lg font-semibold">
-  ⏳ {item.daysLeft} Days Left
-</p>
-
-<p
-  className={`mt-2 font-bold ${
-    item.daysLeft <= 3
-      ? "text-red-600"
-      : item.daysLeft <= 7
-      ? "text-yellow-600"
-      : "text-green-600"
-  }`}
->
-  {item.daysLeft <= 3
-    ? "🚨 Critical"
-    : item.daysLeft <= 7
-    ? "⚠️ Moderate"
-    : "✅ Safe"}
-</p>
-
-<p className="mt-2">
-  🎯 Study Target:
-  {" "}
-  {item.studyHours}h/day
-</p>
-
-<p>
-  🔥 Priority:
-  {" "}
-  {item.priority}
-</p>
-
-<div className="mt-4">
-  <div className="w-full bg-slate-200 rounded-full h-3">
-    <div
-      className="bg-violet-600 h-3 rounded-full"
-      style={{
-        width: `${Math.max(
-          10,
-          100 - item.daysLeft * 5
-        )}%`,
-      }}
-    />
-  </div>
-</div>
+      {/* ── Saved Plans ─────────────────────────────────── */}
+      {savedPlans.length > 0 && (
+        <div className="arc-card p-6 space-y-3">
+          <h3 className="arc-font-display text-lg font-bold arc-text-gradient">Saved Plans</h3>
+          {savedPlans.map((plan) => (
+            <div key={plan.id}
+              className="flex items-center justify-between px-4 py-3 rounded-xl transition-all"
+              style={{
+                background: plan.completed ? "rgba(16,185,129,0.05)" : "var(--arc-bg-elevated)",
+                border: `1px solid ${plan.completed ? "rgba(16,185,129,0.2)" : "var(--arc-border)"}`,
+              }}>
+              <div>
+                <p className="font-semibold text-sm" style={{ color: "var(--arc-text-primary)" }}>{plan.subject}</p>
+                <p className="text-xs mt-0.5" style={{ color: "var(--arc-text-muted)" }}>
+                  {plan.priority} · {plan.study_hours}h/day
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => toggleComplete(plan.id, plan.completed)}
+                  className="text-xs font-bold px-3 py-1.5 rounded-lg transition-all"
+                  style={{
+                    background: plan.completed ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.05)",
+                    color: plan.completed ? "var(--arc-success)" : "var(--arc-text-secondary)",
+                    border: `1px solid ${plan.completed ? "rgba(16,185,129,0.25)" : "var(--arc-border)"}`,
+                  }}>
+                  {plan.completed ? "✓ Done" : "Mark Done"}
+                </button>
+                <button
+                  onClick={() => deletePlan(plan.id)}
+                  className="arc-btn-ghost px-3 py-1.5 text-xs rounded-lg"
+                  style={{ color: "var(--arc-error)", borderColor: "rgba(239,68,68,0.2)" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.08)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}>
+                  Delete
+                </button>
+              </div>
             </div>
           ))}
         </div>
       )}
-
-      <div>
-        <h3 className="text-xl font-bold mb-4">
-          Saved Plans
-        </h3>
-
-        {savedPlans.map((plan) => (
-          <div
-            key={plan.id}
-            className="border p-4 rounded-lg mb-2 flex justify-between items-center"
-          >
-            <div>
-              <strong>
-                {plan.subject}
-              </strong>
-
-              <p>{plan.priority}</p>
-
-              <p>
-                {plan.study_hours}h/day
-              </p>
-            </div>
-
-            <div className="flex gap-2">
-              <button
-                onClick={() =>
-                  toggleComplete(
-                    plan.id,
-                    plan.completed
-                  )
-                }
-                className={
-                  plan.completed
-                    ? "bg-green-600 text-white px-3 py-1 rounded"
-                    : "bg-gray-500 text-white px-3 py-1 rounded"
-                }
-              >
-                {plan.completed
-                  ? "Completed"
-                  : "Mark Done"}
-              </button>
-
-              <button
-                onClick={() =>
-                  deletePlan(plan.id)
-                }
-                className="bg-red-500 text-white px-3 py-1 rounded"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

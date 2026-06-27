@@ -1,163 +1,157 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import supabase from "../lib/supabase";
 
 function ExamsSection() {
-  const [subject, setSubject] = useState("");
+  const [subject, setSubject]   = useState("");
   const [examDate, setExamDate] = useState("");
-  const [exams, setExams] = useState([]);
+  const [exams, setExams]       = useState([]);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
-  useEffect(() => {
-    fetchExams();
-  }, []);
+  useEffect(() => { fetchExams(); }, []);
 
+  // ── All Supabase CRUD logic untouched ───────────────────────
   const fetchExams = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      console.log("No user found");
-      return;
-    }
-
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { console.log("No user found"); return; }
     const { data, error } = await supabase
-      .from("exams")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("exam_date");
-
-    console.log("FETCH DATA:", data);
-    console.log("FETCH ERROR:", error);
-
-    if (!error) {
-      setExams(data || []);
-    }
+      .from("exams").select("*").eq("user_id", user.id).order("exam_date");
+    console.log("FETCH DATA:", data, "FETCH ERROR:", error);
+    if (!error) setExams(data || []);
   };
 
   const addExam = async () => {
-    if (!subject.trim()) {
-      alert("Enter subject");
-      return;
-    }
+    setErrorMsg(""); setSuccessMsg("");
+    if (!subject.trim()) { setErrorMsg("Please enter a subject name."); return; }
+    if (!examDate)       { setErrorMsg("Please select an exam date.");  return; }
 
-    if (!examDate) {
-      alert("Select exam date");
-      return;
-    }
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
+    const { data: { user } } = await supabase.auth.getUser();
     console.log("USER:", user);
-
-    if (!user) {
-      alert("User not logged in");
-      return;
-    }
+    if (!user) { setErrorMsg("User not logged in."); return; }
 
     const { data, error } = await supabase
-      .from("exams")
-      .insert([
-        {
-          subject,
-          exam_date: examDate,
-          user_id: user.id,
-        },
-      ])
-      .select();
+      .from("exams").insert([{ subject, exam_date: examDate, user_id: user.id }]).select();
+    console.log("INSERT DATA:", data, "INSERT ERROR:", error);
 
-    console.log("INSERT DATA:", data);
-    console.log("INSERT ERROR:", error);
+    if (error) { setErrorMsg(error.message); return; }
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    alert("Exam saved successfully!");
-
-    setSubject("");
-    setExamDate("");
-
+    setSuccessMsg("Exam saved successfully!");
+    setTimeout(() => setSuccessMsg(""), 3000);
+    setSubject(""); setExamDate("");
     fetchExams();
   };
 
   const deleteExam = async (id) => {
-    const { error } = await supabase
-      .from("exams")
-      .delete()
-      .eq("id", id);
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
+    const { error } = await supabase.from("exams").delete().eq("id", id);
+    if (error) { setErrorMsg(error.message); return; }
     fetchExams();
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow mt-8">
-      <h2 className="text-2xl font-bold mb-4">
-        Exams
-      </h2>
+    <div className="arc-card p-6 space-y-6">
+      {/* Header */}
+      <div>
+        <h2 className="arc-font-display text-2xl font-bold arc-text-gradient">
+          📅 Exam Schedule
+        </h2>
+        <p className="text-sm mt-1" style={{ color: "var(--arc-text-secondary)" }}>
+          Log your upcoming exams for smart study planning
+        </p>
+      </div>
 
-      <div className="grid md:grid-cols-3 gap-2 mb-4">
+      {/* Inline alerts — no alert() */}
+      {errorMsg && (
+        <div className="arc-alert-error">
+          <span>⚠</span><span>{errorMsg}</span>
+        </div>
+      )}
+      {successMsg && (
+        <div className="arc-alert-success">
+          <span>✓</span><span>{successMsg}</span>
+        </div>
+      )}
+
+      {/* Add exam form */}
+      <div className="grid sm:grid-cols-3 gap-3">
         <input
           type="text"
-          placeholder="Subject"
+          placeholder="Subject name"
           value={subject}
-          onChange={(e) =>
-            setSubject(e.target.value)
-          }
-          className="border p-2 rounded-lg"
+          onChange={(e) => setSubject(e.target.value)}
+          className="arc-input text-sm sm:col-span-1"
+          style={{ background: "rgba(0,0,0,0.4)" }}
         />
-
         <input
           type="date"
           value={examDate}
-          onChange={(e) =>
-            setExamDate(e.target.value)
-          }
-          className="border p-2 rounded-lg"
+          onChange={(e) => setExamDate(e.target.value)}
+          className="arc-input text-sm sm:col-span-1"
+          style={{ background: "rgba(0,0,0,0.4)", colorScheme: "dark" }}
         />
-
         <button
           onClick={addExam}
-          className="bg-black text-white rounded-lg"
+          className="arc-btn-gold py-2.5 px-5 text-sm rounded-xl sm:col-span-1"
         >
           Save Exam
         </button>
       </div>
 
-      {exams.length === 0 ? (
-        <p>No exams added yet.</p>
-      ) : (
-        exams.map((exam) => (
-          <div
-            key={exam.id}
-            className="border p-4 rounded-lg flex justify-between items-center mb-2"
-          >
-            <div>
-              <p className="font-semibold">
-                {exam.subject}
-              </p>
-
-              <p>{exam.exam_date}</p>
-            </div>
-
-            <button
-              onClick={() =>
-                deleteExam(exam.id)
-              }
-              className="bg-red-500 text-white px-3 py-1 rounded"
+      {/* Exam list */}
+      <div className="space-y-2">
+        {exams.length === 0 ? (
+          <p className="text-sm text-center py-6" style={{ color: "var(--arc-text-muted)" }}>
+            No exams added yet. Schedule your first exam above.
+          </p>
+        ) : (
+          exams.map((exam) => (
+            <div
+              key={exam.id}
+              className="flex items-center justify-between px-4 py-3.5 rounded-xl transition-all"
+              style={{
+                background: "var(--arc-bg-elevated)",
+                border: "1px solid var(--arc-border)",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.2)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--arc-border)"; }}
             >
-              Delete
-            </button>
-          </div>
-        ))
-      )}
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-9 h-9 rounded-xl flex items-center justify-center text-base"
+                  style={{
+                    background: "rgba(212,175,55,0.08)",
+                    border: "1px solid rgba(212,175,55,0.15)",
+                  }}
+                >
+                  📅
+                </div>
+                <div>
+                  <p className="font-semibold text-sm" style={{ color: "var(--arc-text-primary)" }}>
+                    {exam.subject}
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: "var(--arc-text-muted)" }}>
+                    {exam.exam_date}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => deleteExam(exam.id)}
+                className="arc-btn-ghost px-3 py-1.5 text-xs rounded-lg"
+                style={{ color: "var(--arc-error)", borderColor: "rgba(239,68,68,0.2)" }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(239,68,68,0.08)";
+                  e.currentTarget.style.borderColor = "rgba(239,68,68,0.35)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.borderColor = "rgba(239,68,68,0.2)";
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }
