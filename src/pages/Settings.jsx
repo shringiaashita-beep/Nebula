@@ -18,7 +18,8 @@ export default function Settings() {
   const [message, setMessage] = useState({ type: "", text: "" });
   const [langMessage, setLangMessage] = useState({ type: "", text: "" });
 
-  const BACKEND_URL = "http://localhost:5000/api/keys";
+  const API_URL = import.meta.env.VITE_API_URL;
+const BACKEND_URL = `${API_URL}/api/keys`;
 
   useEffect(() => {
     fetchSettings();
