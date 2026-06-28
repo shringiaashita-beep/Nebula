@@ -4,6 +4,7 @@ import { generateRevisionPack } from "../lib/gemini";
 function QuickRevision({
   subject,
   topic,
+  onClose
 }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,7 +22,7 @@ function QuickRevision({
 
       setData(result);
     } catch (err) {
-      console.log(err);
+      console.error("QuickRevision generation error:", err);
       setError("Failed to generate revision pack.");
     } finally {
       setLoading(false);
@@ -47,9 +48,20 @@ function QuickRevision({
   return (
     <div className="bg-white rounded-3xl shadow-xl p-6 mt-6">
 
-      <h2 className="text-3xl font-bold mb-4">
-        ⚡ Quick Revision
-      </h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-3xl font-bold">
+          ⚡ Quick Revision
+        </h2>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-red-500 bg-red-50 border border-red-200 hover:bg-red-500 hover:text-white transition-colors"
+            title="Close"
+          >
+            ✖
+          </button>
+        )}
+      </div>
 
       <h3 className="text-xl font-semibold mb-2">
         📖 Summary

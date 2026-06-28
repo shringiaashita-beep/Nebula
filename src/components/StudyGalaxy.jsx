@@ -31,7 +31,6 @@ function StudyGalaxy({ setSelectedSubject, selectedSubject, onHide }) {
     if (!user) return;
     const { data } = await supabase
       .from("subjects").select("*").eq("user_id", user.id);
-    console.log(data);
     setSubjects(data || []);
   };
 

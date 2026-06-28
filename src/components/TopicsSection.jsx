@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import supabase from "../lib/supabase";
 import EliteChallenge from "./EliteChallenge";
 import TopicNotes from "./TopicNotes";
@@ -17,12 +18,10 @@ import ReactMarkdown from "react-markdown";
 function TopicsSection({
   selectedSubject,
 }) {
+  const { t } = useTranslation();
   const button3D =
 "cursor-pointer relative overflow-hidden rounded-2xl px-5 py-3 font-semibold text-white transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 active:translate-y-0 shadow-[0_8px_0_rgba(0,0,0,0.25),0_15px_25px_rgba(0,0,0,0.18)]";
-  console.log(
-  "SELECTED SUBJECT:",
-  selectedSubject
-);
+
 const [subjectName, setSubjectName] = useState("");
 const [topicName, setTopicName] = useState("");
 const [level, setLevel] = useState("");
@@ -41,10 +40,7 @@ const showToast = (message, type = "info") => {
 };
 const alert = (msg) => showToast(msg, "info");
 useEffect(() => {
-  console.log(
-    "TOPICS STATE:",
-    topics
-  );
+
 }, [topics]);
 const [notesTopic, setNotesTopic] =
   useState(null);
@@ -94,23 +90,14 @@ const {
     ascending: true,
   }
 );
-  console.log(
-  "FILTER:",
-  selectedSubject
-);
 
-console.log(
-  "TOPICS:",
-  data
-);
+
+
 if (error) {
-  console.log(error);
+  console.error(error);
   return;
 }
-console.log(
-  "SETTING:",
-  data
-);
+
 
 setTopics(data || []);
 };
@@ -145,7 +132,7 @@ const {
   .maybeSingle();
 
 if (existingError) {
-  console.log(existingError);
+  console.error(existingError);
   return;
 }
 
@@ -184,7 +171,7 @@ const deleteTopic = async (id) => {
       .eq("id", id);
 
   if (error) {
-    console.log(error);
+    console.error(error);
     return;
   }
 
@@ -202,7 +189,7 @@ const updateTopic = async (
       .eq("id", topicId);
 
   if (error) {
-    console.log(error);
+    console.error(error);
     return;
   }
 
@@ -291,7 +278,7 @@ const generateAITopics =
         .insert(rows);
 
     if (error) {
-      console.log(error);
+      console.error(error);
       return;
     }
 
@@ -330,7 +317,7 @@ const generateNotesForAllTopics =
         .in("subject_name", subjects);
 
     if (notesError) {
-      console.log(notesError);
+      console.error(notesError);
       return;
     }
 
@@ -382,7 +369,7 @@ const generateNotesForAllTopics =
           generatedCount += 1;
         }
       } catch (error) {
-        console.log(
+        console.error(
           "Error generating notes for",
           topic.topic_name,
           error
@@ -416,7 +403,7 @@ const generateHardQuestionsForTopic =
         .eq("topic_name", topicText);
 
     if (existingError) {
-      console.log(existingError);
+      console.error(existingError);
       alert("Could not check existing questions.");
       return;
     }
@@ -498,7 +485,7 @@ const generateHardQuestionsForTopic =
     setQuestionGeneratingTopicId(null);
 
     if (insertError) {
-      console.log(insertError);
+      console.error(insertError);
       alert("Failed to save generated questions.");
       return;
     }
@@ -528,7 +515,7 @@ const { error } = await supabase
   .eq("user_id", user.id);
 
 if (error) {
-  console.log(error);
+  console.error(error);
   return;
 }
 
@@ -740,7 +727,7 @@ fetchTopics();
                         className="w-full text-left px-4 py-2.5 text-xs font-medium transition-all hover:bg-red-500/10"
                         style={{ color: "var(--arc-error)" }}
                       >
-                        🗑 Delete
+                        🗑 {t("Buttons.Delete")}
                       </button>
                     </div>
                   </div>
@@ -751,16 +738,16 @@ fetchTopics();
             {/* Child Components if open */}
             <div className="mt-4">
               {notesTopic?.id === topic.id && (
-                <TopicNotes subject={topic.subject_name} topic={topic.topic_name} />
+                <TopicNotes subject={topic.subject_name} topic={topic.topic_name} onClose={() => setNotesTopic(null)} />
               )}
               {flashcardTopic?.id === topic.id && (
-                <Flashcards subject={topic.subject_name} topic={topic.topic_name} />
+                <Flashcards subject={topic.subject_name} topic={topic.topic_name} onClose={() => setFlashcardTopic(null)} />
               )}
               {mindMapTopic?.id === topic.id && (
-                <MindMap subject={topic.subject_name} topic={topic.topic_name} />
+                <MindMap subject={topic.subject_name} topic={topic.topic_name} onClose={() => setMindMapTopic(null)} />
               )}
               {revisionTopic?.id === topic.id && (
-                <QuickRevision subject={topic.subject_name} topic={topic.topic_name} />
+                <QuickRevision subject={topic.subject_name} topic={topic.topic_name} onClose={() => setRevisionTopic(null)} />
               )}
             </div>
           </div>

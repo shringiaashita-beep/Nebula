@@ -1,0 +1,138 @@
+{
+  "Navigation": {
+    "Home": "Home",
+    "Dashboard": "Dashboard",
+    "Study Planner": "Study Planner",
+    "Subjects": "Subjects",
+    "PYQs": "PYQs",
+    "Mock Tests": "Mock Tests",
+    "Practice": "Practice",
+    "Notes": "Notes",
+    "Bookmarks": "Bookmarks",
+    "Analytics": "Analytics",
+    "Profile": "Profile",
+    "Settings": "Settings",
+    "AI Settings": "AI Settings",
+    "Logout": "Log Out",
+    "Language": "Language"
+  },
+  "Dashboard": {
+    "Welcome": "Welcome back",
+    "Statistics": "Stats"
+  },
+  "Planner": {
+    "Today's Tasks": "Aaj Ke Tasks",
+    "Upcoming Tasks": "Aane Wale Tasks",
+    "Completed": "Complete Ho Gaye",
+    "Pending": "Bache Hue",
+    "Add Task": "Task Add Karein",
+    "Edit Task": "Edit Karein",
+    "Delete Task": "Delete Karein",
+    "Schedule": "Schedule",
+    "Calendar": "Calendar",
+    "Reminders": "Reminders",
+    "Goals": "Goals"
+  },
+  "Subjects": {
+    "Mathematics": "Ganit",
+    "Physics": "Bhautik Vigyan",
+    "Chemistry": "Rasayan Vigyan",
+    "Biology": "Jeev Vigyan",
+    "History": "Itihas"
+  },
+  "PYQ": {
+    "Previous Year Questions": "Pichle Saal Ke Questions",
+    "Filters": "Filters",
+    "Search": "Search Karein",
+    "Difficulty": "Difficulty",
+    "Easy": "Aasan",
+    "Medium": "Medium",
+    "Hard": "Mushkil",
+    "Solution": "Solution",
+    "Explanation": "Explanation",
+    "Bookmark": "Bookmark",
+    "Attempt": "Attempt Karein",
+    "Correct Answer": "Sahi Jawab",
+    "Time": "Time",
+    "Year": "Saal",
+    "Exam": "Exam",
+    "Topic": "Topic",
+    "Chapter": "Chapter",
+    "Marks": "Marks",
+    "Negative Marks": "Negative Marks"
+  },
+  "MockTests": {
+    "Start Test": "Test Shuru Karein",
+    "Resume": "Resume Karein",
+    "Submit": "Submit Karein",
+    "Next": "Agla",
+    "Previous": "Pichla",
+    "Review": "Review Karein",
+    "Finish": "Khatam Karein",
+    "Score": "Score",
+    "Accuracy": "Accuracy",
+    "Time Remaining": "Bacha Hua Time"
+  },
+  "AI": {
+    "AI Notes": "AI Notes",
+    "AI Summary": "AI Summary",
+    "AI Explanation": "AI Explanation",
+    "AI Quiz": "AI Quiz",
+    "AI Flashcards": "AI Flashcards",
+    "AI Roadmap": "AI Roadmap",
+    "AI Study Planner": "AI Study Planner",
+    "AI Doubt Solver": "AI Doubt Solver"
+  },
+  "Auth": {
+    "Login": "Login",
+    "Register": "Register",
+    "Forgot Password": "Password Bhool Gaye",
+    "Email": "Email",
+    "Password": "Password",
+    "Confirm Password": "Password Confirm Karein",
+    "Continue": "Continue",
+    "Sign In": "Sign In",
+    "Sign Up": "Sign Up"
+  },
+  "Settings": {
+    "Language": "Language",
+    "Theme": "Theme",
+    "Notifications": "Notifications",
+    "Privacy": "Privacy",
+    "Security": "Security",
+    "Account": "Account",
+    "AI Settings": "AI Settings",
+    "Delete Account": "Account Delete Karein"
+  },
+  "Errors": {
+    "Network Error": "Network Error Hai",
+    "Invalid Password": "Galat Password",
+    "Login Failed": "Login Fail Ho Gaya",
+    "Saved Successfully": "Save Ho Gaya",
+    "Something Went Wrong": "Kuch Galat Ho Gaya",
+    "Loading...": "Load Ho Raha Hai...",
+    "Retry": "Fir Se Try Karein"
+  },
+  "Notifications": {
+    "Success": "Success",
+    "Warning": "Warning",
+    "Error": "Error",
+    "Information": "Information"
+  },
+  "Buttons": {
+    "Save": "Save",
+    "Cancel": "Cancel",
+    "Delete": "Delete",
+    "Edit": "Edit",
+    "Continue": "Continue",
+    "Start": "Start",
+    "Finish": "Finish",
+    "Next": "Agla",
+    "Previous": "Pichla",
+    "Download": "Download",
+    "Upload": "Upload",
+    "Generate": "Generate Karein",
+    "Refresh": "Refresh",
+    "Retry": "Retry"
+  }
+}

@@ -2,12 +2,16 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 import supabase from "../lib/supabase";
 import { ThemeContext } from "../context/ThemeContext";
+import { LANGUAGES } from "../config/languages";
+import { useTranslation } from "react-i18next";
 
 import DashboardHome from "./DashboardHome";
 import SubjectsPage from "./SubjectsPage";
 import PlannerPage from "./PlannerPage";
 import ProgressPage from "./ProgressPage";
 import PYQPage from "./PYQPage";
+import SummaryPage from "./SummaryPage";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 // ── Sidebar navigation config ──────────────────────────────────
 const NAV_ITEMS = [
@@ -16,20 +20,61 @@ const NAV_ITEMS = [
   { id: "planner",   label: "Planner",    icon: "◷" },
   { id: "progress",  label: "Progress",   icon: "◉" },
   { id: "pyq",       label: "PYQ Hub",    icon: "◎" },
+  { id: "summary",   label: "Summary",    icon: "📖" },
 ];
 
 function Dashboard() {
+  const { t } = useTranslation();
   const { darkMode, toggleDarkMode } = useContext(ThemeContext);
   const [activePage, setActivePage] = useState("dashboard");
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [language, setLanguage] = useState("english");
+  const [savingLang, setSavingLang] = useState(false);
+  const [showWelcomeBanner, setShowWelcomeBanner] = useState(true);
   const navigate = useNavigate();
 
   // ── Auth & profile bootstrap (unchanged) ─────────────────────
   useEffect(() => {
     createProfile();
     createStreak();
+    fetchLanguagePreference();
+
+    // Auto-hide the welcome banner after 2 minutes (120,000 ms)
+    const bannerTimer = setTimeout(() => {
+      setShowWelcomeBanner(false);
+    }, 120000);
+    return () => clearTimeout(bannerTimer);
   }, []);
+
+  const fetchLanguagePreference = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await supabase
+      .from("profiles")
+      .select("language_preference")
+      .eq("id", user.id)
+      .single();
+    if (data?.language_preference) {
+      setLanguage(data.language_preference.toLowerCase());
+    }
+  };
+
+  const handleLanguageChange = async (newLang) => {
+    setLanguage(newLang);
+    import("i18next").then((i18n) => {
+      i18n.default.changeLanguage(newLang);
+    });
+    setSavingLang(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase
+        .from("profiles")
+        .update({ language_preference: newLang })
+        .eq("id", user.id);
+    }
+    setSavingLang(false);
+  };
 
   const createProfile = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -48,6 +93,7 @@ function Dashboard() {
           username: user.email.split("@")[0],
           xp: 0,
           level: 1,
+          language_preference: "english"
         },
       ]);
     }
@@ -87,6 +133,7 @@ function Dashboard() {
     planner:   "Study Planner",
     progress:  "Progress Report",
     pyq:       "PYQ Hub",
+    summary:   "About Nebula",
   };
 
   return (
@@ -139,7 +186,7 @@ function Dashboard() {
               className={`arc-nav-item ${activePage === id ? "active" : ""}`}
             >
               <span className="text-base leading-none">{icon}</span>
-              <span>{label}</span>
+              <span>{t("Navigation." + (id === 'pyq' ? 'PYQs' : id === 'progress' ? 'Analytics' : id === 'planner' ? 'Study Planner' : id.charAt(0).toUpperCase() + id.slice(1)))}</span>
 
               {/* Active gold indicator line */}
               {activePage === id && (
@@ -165,12 +212,20 @@ function Dashboard() {
             </span>
           </button>
 
+          {/* API Settings ─────────────────────────────────────── */}
+          <button
+            onClick={() => navigate("/settings")}
+            className="arc-btn-ghost w-full text-left px-4 py-2 text-xs flex items-center gap-2 text-purple-400 hover:text-purple-300"
+          >
+            <span>⚙️</span> API Settings (BYOK)
+          </button>
+
           {/* Logout ─────────────────────────────────────────── */}
           <button
             onClick={handleLogout}
             className="arc-btn-ghost w-full text-left px-4 py-2.5 text-sm"
           >
-            ⇠ Sign Out
+            ⇠ {t("Navigation.Logout")}
           </button>
         </div>
       </aside>
@@ -207,28 +262,83 @@ function Dashboard() {
             </h2>
           </div>
 
-          {/* Gold accent dot — decorative */}
-          <div
-            className="w-2 h-2 rounded-full animate-pulse"
-            style={{ background: "var(--arc-gold-400)" }}
-            title="Live"
-          />
+          <div className="flex items-center gap-4">
+            {/* Quick Language Selector */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold" style={{ color: "var(--arc-text-muted)" }}>🌐</span>
+              <select
+                value={language}
+                onChange={(e) => handleLanguageChange(e.target.value)}
+                disabled={savingLang}
+                className="bg-transparent text-sm border border-gray-600 rounded-md px-2 py-1 outline-none cursor-pointer focus:border-blue-500 transition-colors"
+                style={{ color: "var(--arc-text-primary)", background: "var(--arc-bg-base)" }}
+                title="AI Content Language"
+              >
+                {LANGUAGES.map((lang) => (
+                  <option key={lang.id} value={lang.id}>
+                    {lang.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            {/* Gold accent dot — decorative */}
+            <div
+              className="w-2 h-2 rounded-full animate-pulse"
+              style={{ background: "var(--arc-gold-400)" }}
+              title="Live"
+            />
+          </div>
         </header>
 
         {/* ── Page content ─────────────────────────────────── */}
         <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
-          {activePage === "dashboard" && (
-            <DashboardHome
-              selectedSubject={selectedSubject}
-              setSelectedSubject={setSelectedSubject}
-            />
+          
+          {showWelcomeBanner && (
+            <div className="mb-6 p-4 rounded-xl border flex justify-between items-start animate-fade-in" 
+                 style={{ 
+                   background: "linear-gradient(to right, rgba(95,39,205,0.1), rgba(212,175,55,0.1))",
+                   borderColor: "rgba(212,175,55,0.5)",
+                   boxShadow: "0 0 20px rgba(212,175,55,0.15)"
+                 }}>
+              <div className="flex gap-4">
+                <span className="text-3xl mt-1">✨</span>
+                <div>
+                  <h3 className="font-bold text-lg mb-1.5" style={{ color: "var(--arc-gold-400)" }}>
+                    Welcome to Nebula Study Command Center
+                  </h3>
+                  <p className="text-sm font-medium leading-relaxed" style={{ color: "var(--arc-text-primary)" }}>
+                    If you want to generate Notes and other AI study material, please add your API Key according to the process written in the <button onClick={() => navigate("/settings")} className="underline font-bold text-purple-400 hover:text-purple-300">API Settings</button> section.
+                    <br/>
+                    If you just want to practice, you can move directly to the <button onClick={() => handleNav("pyq")} className="underline font-bold text-emerald-400 hover:text-emerald-300">PYQ Hub</button> and solve questions freely without needing an API key!
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowWelcomeBanner(false)} 
+                className="text-gray-400 hover:text-white font-black ml-4 px-2 py-1 bg-black/20 rounded-md transition-colors"
+                title="Dismiss"
+              >
+                ✖
+              </button>
+            </div>
           )}
-          {activePage === "subjects" && (
-            <SubjectsPage selectedSubject={selectedSubject} />
-          )}
-          {activePage === "planner" && <PlannerPage />}
-          {activePage === "progress" && <ProgressPage />}
-          {activePage === "pyq"      && <PYQPage />}
+
+          <ErrorBoundary>
+            {activePage === "dashboard" && (
+              <DashboardHome
+                selectedSubject={selectedSubject}
+                setSelectedSubject={setSelectedSubject}
+              />
+            )}
+            {activePage === "subjects" && (
+              <SubjectsPage selectedSubject={selectedSubject} />
+            )}
+            {activePage === "planner" && <PlannerPage />}
+            {activePage === "progress" && <ProgressPage />}
+            {activePage === "pyq"      && <PYQPage />}
+            {activePage === "summary"  && <SummaryPage />}
+          </ErrorBoundary>
         </main>
       </div>
 

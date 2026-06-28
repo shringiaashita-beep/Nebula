@@ -13,10 +13,14 @@ function DashboardHome({
   const [showGalaxy, setShowGalaxy] = useState(true);
 
   useEffect(() => {
-    // Force enable the galaxy map on mount as requested
-    localStorage.setItem("showGalaxyMap", "true");
-    setShowGalaxy(true);
-    window.dispatchEvent(new Event("galaxyMapToggle"));
+    // Load preference from local storage without forcing it to true
+    const stored = localStorage.getItem("showGalaxyMap");
+    if (stored === null) {
+      localStorage.setItem("showGalaxyMap", "true");
+      setShowGalaxy(true);
+    } else {
+      setShowGalaxy(stored !== "false");
+    }
 
     const handleToggle = () => {
       setShowGalaxy(localStorage.getItem("showGalaxyMap") !== "false");

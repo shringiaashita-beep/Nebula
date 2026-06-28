@@ -54,7 +54,7 @@ function SyllabusGenerator() {
       setExplanation(explanationMatch?.[1]?.trim() || "");
       setChallenge(challengeMatch?.[1]?.trim() || "");
     } catch (error) {
-      console.log(error);
+      console.error("Syllabus generation error:", error);
     } finally {
       setLoading(false);
     }

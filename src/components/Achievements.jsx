@@ -11,7 +11,7 @@ function Achievements() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     const { data, error } = await supabase.from("user_badges").select("*").eq("user_id", user.id);
-    if (error) { console.log(error); return; }
+    if (error) { console.error("Achievements fetch error:", error); return; }
     setBadges(data || []);
   };
 

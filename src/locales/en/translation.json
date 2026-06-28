@@ -1,0 +1,138 @@
+{
+  "Navigation": {
+    "Home": "Home",
+    "Dashboard": "Dashboard",
+    "Study Planner": "Study Planner",
+    "Subjects": "Subjects",
+    "PYQs": "PYQs",
+    "Mock Tests": "Mock Tests",
+    "Practice": "Practice",
+    "Notes": "Notes",
+    "Bookmarks": "Bookmarks",
+    "Analytics": "Analytics",
+    "Profile": "Profile",
+    "Settings": "Settings",
+    "AI Settings": "AI Settings",
+    "Logout": "Logout",
+    "Language": "Language"
+  },
+  "Dashboard": {
+    "Welcome": "Welcome back",
+    "Statistics": "Statistics"
+  },
+  "Planner": {
+    "Today's Tasks": "Today's Tasks",
+    "Upcoming Tasks": "Upcoming Tasks",
+    "Completed": "Completed",
+    "Pending": "Pending",
+    "Add Task": "Add Task",
+    "Edit Task": "Edit Task",
+    "Delete Task": "Delete Task",
+    "Schedule": "Schedule",
+    "Calendar": "Calendar",
+    "Reminders": "Reminders",
+    "Goals": "Goals"
+  },
+  "Subjects": {
+    "Mathematics": "Mathematics",
+    "Physics": "Physics",
+    "Chemistry": "Chemistry",
+    "Biology": "Biology",
+    "History": "History"
+  },
+  "PYQ": {
+    "Previous Year Questions": "Previous Year Questions",
+    "Filters": "Filters",
+    "Search": "Search",
+    "Difficulty": "Difficulty",
+    "Easy": "Easy",
+    "Medium": "Medium",
+    "Hard": "Hard",
+    "Solution": "Solution",
+    "Explanation": "Explanation",
+    "Bookmark": "Bookmark",
+    "Attempt": "Attempt",
+    "Correct Answer": "Correct Answer",
+    "Time": "Time",
+    "Year": "Year",
+    "Exam": "Exam",
+    "Topic": "Topic",
+    "Chapter": "Chapter",
+    "Marks": "Marks",
+    "Negative Marks": "Negative Marks"
+  },
+  "MockTests": {
+    "Start Test": "Start Test",
+    "Resume": "Resume",
+    "Submit": "Submit",
+    "Next": "Next",
+    "Previous": "Previous",
+    "Review": "Review",
+    "Finish": "Finish",
+    "Score": "Score",
+    "Accuracy": "Accuracy",
+    "Time Remaining": "Time Remaining"
+  },
+  "AI": {
+    "AI Notes": "AI Notes",
+    "AI Summary": "AI Summary",
+    "AI Explanation": "AI Explanation",
+    "AI Quiz": "AI Quiz",
+    "AI Flashcards": "AI Flashcards",
+    "AI Roadmap": "AI Roadmap",
+    "AI Study Planner": "AI Study Planner",
+    "AI Doubt Solver": "AI Doubt Solver"
+  },
+  "Auth": {
+    "Login": "Login",
+    "Register": "Register",
+    "Forgot Password": "Forgot Password",
+    "Email": "Email",
+    "Password": "Password",
+    "Confirm Password": "Confirm Password",
+    "Continue": "Continue",
+    "Sign In": "Sign In",
+    "Sign Up": "Sign Up"
+  },
+  "Settings": {
+    "Language": "Language",
+    "Theme": "Theme",
+    "Notifications": "Notifications",
+    "Privacy": "Privacy",
+    "Security": "Security",
+    "Account": "Account",
+    "AI Settings": "AI Settings",
+    "Delete Account": "Delete Account"
+  },
+  "Errors": {
+    "Network Error": "Network Error",
+    "Invalid Password": "Invalid Password",
+    "Login Failed": "Login Failed",
+    "Saved Successfully": "Saved Successfully",
+    "Something Went Wrong": "Something Went Wrong",
+    "Loading...": "Loading...",
+    "Retry": "Retry"
+  },
+  "Notifications": {
+    "Success": "Success",
+    "Warning": "Warning",
+    "Error": "Error",
+    "Information": "Information"
+  },
+  "Buttons": {
+    "Save": "Save",
+    "Cancel": "Cancel",
+    "Delete": "Delete",
+    "Edit": "Edit",
+    "Continue": "Continue",
+    "Start": "Start",
+    "Finish": "Finish",
+    "Next": "Next",
+    "Previous": "Previous",
+    "Download": "Download",
+    "Upload": "Upload",
+    "Generate": "Generate",
+    "Refresh": "Refresh",
+    "Retry": "Retry"
+  }
+}

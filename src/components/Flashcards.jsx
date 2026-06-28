@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import supabase from "../lib/supabase";
 import { generateFlashcards } from "../lib/gemini";
 
-function Flashcards({ subject, topic }) {
+function Flashcards({ subject, topic, onClose }) {
   const [cards, setCards] = useState([]);
   const [current, setCurrent] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
@@ -35,7 +35,7 @@ function Flashcards({ subject, topic }) {
       await supabase.from("flashcards").insert(rows);
       setCards(rows);
     } catch (err) {
-      console.log(err);
+      console.error("Flashcard generation error:", err);
     }
   };
 
@@ -80,9 +80,20 @@ function Flashcards({ subject, topic }) {
         color: "var(--arc-text-primary)"
       }}
     >
-      <h3 className="font-bold text-lg mb-4" style={{ color: "var(--arc-text-hero)" }}>
-        🃏 Flashcard Review
-      </h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-bold text-lg" style={{ color: "var(--arc-text-hero)" }}>
+          🃏 Flashcard Review
+        </h3>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:text-white transition-colors"
+            title="Close"
+          >
+            ✖
+          </button>
+        )}
+      </div>
 
       <div
         className="p-5 rounded-xl border mb-4"

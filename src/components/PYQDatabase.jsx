@@ -40,6 +40,9 @@ function PYQDatabase() {
   const [notes, setNotes] = useState({});
   const [editingNoteId, setEditingNoteId] = useState(null);
   const [tempNoteText, setTempNoteText] = useState("");
+  const [reportingErrorId, setReportingErrorId] = useState(null);
+  const [reportingErrorType, setReportingErrorType] = useState("");
+  const [errorReportDesc, setErrorReportDesc] = useState("");
 
   // Explorer interactive learning mode states
   const [explorerAnswers, setExplorerAnswers] = useState({});
@@ -178,12 +181,19 @@ function PYQDatabase() {
     }
   };
 
-  const handleReportError = async (id, type) => {
-    const desc = prompt("Please provide detail about the issue:");
-    if (!desc) return;
-    const ok = await pyqApi.reportError(id, type, desc);
+  const handleReportError = (id, type) => {
+    setReportingErrorId(id);
+    setReportingErrorType(type);
+    setErrorReportDesc("");
+  };
+
+  const submitErrorReport = async () => {
+    if (!errorReportDesc.trim()) return;
+    const ok = await pyqApi.reportError(reportingErrorId, reportingErrorType, errorReportDesc.trim());
     if (ok) {
       showInfo("✓ Error reported. Thank you for your feedback!", "success");
+      setReportingErrorId(null);
+      setErrorReportDesc("");
     }
   };
 
@@ -431,9 +441,10 @@ function PYQDatabase() {
               style={{ background: "rgba(0,0,0,0.4)" }}
             >
               <option value="">All Difficulties</option>
-              <option value="Easy">Easy</option>
-              <option value="Medium">Medium</option>
-              <option value="Hard">Hard</option>
+              <option value="Easy">🟢 Easy</option>
+              <option value="Medium">🟡 Medium</option>
+              <option value="Hard">🔴 Hard</option>
+              <option value="Hardest">💀 Hardest (JEE Advanced)</option>
             </select>
 
             <select
@@ -505,6 +516,12 @@ function PYQDatabase() {
                     >
                       {q.exam}
                     </button>
+                    {/* JEE Advanced hardest badge */}
+                    {q.exam === "JEE Advanced" && (
+                      <span className="bg-red-900/30 text-red-400 px-2 py-0.5 rounded-full border border-red-500/40 font-black uppercase tracking-wider animate-pulse">
+                        💀 HARDEST
+                      </span>
+                    )}
                     <button
                       onClick={() => { setFilterSubject(q.subject); setCurrentPage(1); }}
                       title={`Filter by subject: ${q.subject}`}
@@ -526,19 +543,65 @@ function PYQDatabase() {
                     >
                       Year {q.year}
                     </button>
+                    {/* Color-coded difficulty badge */}
                     <button
                       onClick={() => { setFilterDifficulty(q.difficulty); setCurrentPage(1); }}
                       title={`Filter by difficulty: ${q.difficulty}`}
-                      className="bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded-full border border-indigo-500/20 font-semibold transition-all hover:bg-indigo-500/25 cursor-pointer"
+                      className="px-2 py-0.5 rounded-full border font-semibold transition-all cursor-pointer"
+                      style={{
+                        background: q.difficulty === "Hard" || q.difficulty === "Hardest"
+                          ? "rgba(239,68,68,0.1)"
+                          : q.difficulty === "Medium"
+                          ? "rgba(245,158,11,0.1)"
+                          : "rgba(16,185,129,0.1)",
+                        borderColor: q.difficulty === "Hard" || q.difficulty === "Hardest"
+                          ? "rgba(239,68,68,0.4)"
+                          : q.difficulty === "Medium"
+                          ? "rgba(245,158,11,0.4)"
+                          : "rgba(16,185,129,0.4)",
+                        color: q.difficulty === "Hard" || q.difficulty === "Hardest"
+                          ? "#f87171"
+                          : q.difficulty === "Medium"
+                          ? "#fbbf24"
+                          : "#34d399"
+                      }}
                     >
-                      {q.difficulty}
+                      {q.difficulty === "Hard" ? "🔴 Hard" : q.difficulty === "Hardest" ? "💀 Hardest" : q.difficulty === "Easy" ? "🟢 Easy" : "🟡 Medium"}
                     </button>
+                    {/* Image-based question badge */}
+                    {q.images && q.images.length > 0 && (
+                      <span className="bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/20 font-semibold">
+                        🖼️ Image-Based
+                      </span>
+                    )}
                   </div>
 
                   {/* Question body */}
                   <div className="text-sm font-semibold text-white leading-relaxed pt-1">
                     <MathRenderer text={q.question} />
                   </div>
+
+                  {/* Image-based question display — rendered in B&W like real exam papers */}
+                  {q.images && q.images.length > 0 && (
+                    <div className="mt-3 space-y-2">
+                      <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">📷 Diagram / Figure</p>
+                      <div className="flex flex-wrap gap-3">
+                        {q.images.map((imgUrl, imgIdx) => (
+                          <div key={imgIdx} className="border border-slate-700 rounded-xl overflow-hidden bg-white p-2">
+                            <img
+                              src={imgUrl}
+                              alt={`Question diagram ${imgIdx + 1}`}
+                              className="max-w-xs max-h-64 object-contain rounded"
+                              style={{
+                                filter: "grayscale(100%) contrast(1.2)",
+                                WebkitFilter: "grayscale(100%) contrast(1.2)"
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Options display */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
@@ -689,6 +752,35 @@ function PYQDatabase() {
                           className="arc-btn-gold px-3 py-1.5 text-xs rounded-lg"
                         >
                           Save Note
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Error Report overlay */}
+                  {reportingErrorId === q.id && (
+                    <div className="bg-slate-950 p-4 rounded-xl border border-red-500/20 space-y-3 mt-2">
+                      <h4 className="text-xs font-bold text-red-400">Report Issue for Question #{q.id} ({reportingErrorType})</h4>
+                      <textarea
+                        value={errorReportDesc}
+                        onChange={(e) => setErrorReportDesc(e.target.value)}
+                        className="arc-input text-xs w-full"
+                        rows="3"
+                        placeholder="Describe the issue (typo, wrong answer, formatting error, etc.)..."
+                        style={{ background: "rgba(0,0,0,0.4)" }}
+                      />
+                      <div className="flex gap-2 justify-end">
+                        <button
+                          onClick={() => setReportingErrorId(null)}
+                          className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={submitErrorReport}
+                          className="px-3 py-1.5 text-xs rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition-colors"
+                        >
+                          Submit Report
                         </button>
                       </div>
                     </div>

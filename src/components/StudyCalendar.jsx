@@ -14,7 +14,9 @@ function StudyCalendar() {
     if (!user) return;
     const { data, error } = await supabase
       .from("study_sessions").select("*").eq("user_id", user.id);
-    console.log("SESSIONS:", data, "ERROR:", error);
+    if (error) {
+      console.error("SESSIONS FETCH ERROR:", error);
+    }
     setSessions(data || []);
   };
 

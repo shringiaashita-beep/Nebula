@@ -12,6 +12,21 @@ function ProtectedRoute({ children }) {
         data: { session },
       } = await supabase.auth.getSession();
 
+      if (session?.user) {
+        // Fetch language preference
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("language_preference")
+          .eq("id", session.user.id)
+          .single();
+
+        if (profile?.language_preference) {
+          import("i18next").then((i18n) => {
+            i18n.default.changeLanguage(profile.language_preference);
+          });
+        }
+      }
+
       setSession(session);
       setLoading(false);
     };

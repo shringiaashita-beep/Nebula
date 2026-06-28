@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import supabase from "../lib/supabase";
+import { useTranslation } from "react-i18next";
 
 function Register() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -103,7 +105,7 @@ function Register() {
           className="text-center text-sm font-medium mb-6"
           style={{ color: "var(--arc-text-secondary)" }}
         >
-          Create your account
+          {t("Auth.Register")}
         </p>
 
         {/* Error / Success banners */}
@@ -147,7 +149,7 @@ function Register() {
               className="block text-sm font-semibold mb-2"
               style={{ color: "var(--arc-text-secondary)" }}
             >
-              Email Address
+              {t("Auth.Email")}
             </label>
             <input
               id="reg-email"
@@ -166,7 +168,7 @@ function Register() {
               className="block text-sm font-semibold mb-2"
               style={{ color: "var(--arc-text-secondary)" }}
             >
-              Password
+              {t("Auth.Password")}
             </label>
             <input
               id="reg-password"
@@ -208,7 +210,7 @@ function Register() {
             disabled={loading}
             className="arc-btn-gold w-full py-3.5 text-sm"
           >
-            {loading ? "Initializing Profile…" : "Initialize Command Node"}
+            {loading ? t("Errors.Loading...") : t("Auth.Register")}
           </button>
         </form>
 
@@ -222,7 +224,7 @@ function Register() {
             onMouseOver={(e) => (e.target.style.color = "var(--arc-gold-300)")}
             onMouseOut={(e) => (e.target.style.color = "var(--arc-gold-400)")}
           >
-            Sign in →
+            {t("Auth.Sign In")} →
           </Link>
         </p>
       </div>

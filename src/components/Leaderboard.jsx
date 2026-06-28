@@ -17,7 +17,7 @@ function Leaderboard() {
   const fetchLeaderboard = async () => {
     const { data, error } = await supabase
       .from("profiles").select("*").order("xp", { ascending: false });
-    if (error) { console.log(error); return; }
+    if (error) { console.error("Leaderboard fetch error:", error); return; }
     setUsers(data || []);
   };
 

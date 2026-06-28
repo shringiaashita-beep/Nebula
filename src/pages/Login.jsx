@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import supabase from "../lib/supabase";
+import { useTranslation } from "react-i18next";
 
 function Login() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -90,7 +92,7 @@ function Login() {
         {/* Section label */}
         <p className="text-center text-sm font-medium mb-6"
           style={{ color: "var(--arc-text-secondary)" }}>
-          Sign in to your account
+          {t("Auth.Sign In")}
         </p>
 
         {/* Error banner */}
@@ -109,7 +111,7 @@ function Login() {
               className="block text-sm font-semibold mb-2"
               style={{ color: "var(--arc-text-secondary)" }}
             >
-              Email Address
+              {t("Auth.Email")}
             </label>
             <input
               id="login-email"
@@ -128,7 +130,7 @@ function Login() {
               className="block text-sm font-semibold mb-2"
               style={{ color: "var(--arc-text-secondary)" }}
             >
-              Password
+              {t("Auth.Password")}
             </label>
             <input
               id="login-password"
@@ -170,7 +172,7 @@ function Login() {
             disabled={loading}
             className="arc-btn-gold w-full py-3.5 text-sm"
           >
-            {loading ? "Authenticating…" : "Enter Command Center"}
+            {loading ? t("Errors.Loading...") : t("Auth.Login")}
           </button>
         </form>
 
@@ -184,7 +186,7 @@ function Login() {
             onMouseOver={(e) => (e.target.style.color = "var(--arc-gold-300)")}
             onMouseOut={(e) => (e.target.style.color = "var(--arc-gold-400)")}
           >
-            Create account →
+            {t("Auth.Sign Up")} →
           </Link>
         </p>
       </div>

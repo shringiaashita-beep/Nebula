@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import supabase from "../lib/supabase";
+import { useTranslation } from "react-i18next";
 
 function ExamsSection() {
+  const { t } = useTranslation();
   const [subject, setSubject]   = useState("");
   const [examDate, setExamDate] = useState("");
   const [exams, setExams]       = useState([]);
@@ -13,10 +15,10 @@ function ExamsSection() {
   // ── All Supabase CRUD logic untouched ───────────────────────
   const fetchExams = async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { console.log("No user found"); return; }
+    if (!user) { return; }
     const { data, error } = await supabase
       .from("exams").select("*").eq("user_id", user.id).order("exam_date");
-    console.log("FETCH DATA:", data, "FETCH ERROR:", error);
+    
     if (!error) setExams(data || []);
   };
 
@@ -26,12 +28,12 @@ function ExamsSection() {
     if (!examDate)       { setErrorMsg("Please select an exam date.");  return; }
 
     const { data: { user } } = await supabase.auth.getUser();
-    console.log("USER:", user);
+    
     if (!user) { setErrorMsg("User not logged in."); return; }
 
     const { data, error } = await supabase
       .from("exams").insert([{ subject, exam_date: examDate, user_id: user.id }]).select();
-    console.log("INSERT DATA:", data, "INSERT ERROR:", error);
+    
 
     if (error) { setErrorMsg(error.message); return; }
 
@@ -92,7 +94,7 @@ function ExamsSection() {
           onClick={addExam}
           className="arc-btn-gold py-2.5 px-5 text-sm rounded-xl sm:col-span-1"
         >
-          Save Exam
+          {t("Buttons.Save")}
         </button>
       </div>
 
@@ -146,7 +148,7 @@ function ExamsSection() {
                   e.currentTarget.style.borderColor = "rgba(239,68,68,0.2)";
                 }}
               >
-                Delete
+                {t("Buttons.Delete")}
               </button>
             </div>
           ))

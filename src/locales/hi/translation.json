@@ -1,0 +1,138 @@
+{
+  "Navigation": {
+    "Home": "होम",
+    "Dashboard": "डैशबोर्ड",
+    "Study Planner": "स्टडी प्लानर",
+    "Subjects": "विषय",
+    "PYQs": "पिछले वर्ष के प्रश्न",
+    "Mock Tests": "मॉक टेस्ट",
+    "Practice": "अभ्यास",
+    "Notes": "नोट्स",
+    "Bookmarks": "बुकमार्क",
+    "Analytics": "एनालिटिक्स",
+    "Profile": "प्रोफ़ाइल",
+    "Settings": "सेटिंग्स",
+    "AI Settings": "एआई सेटिंग्स",
+    "Logout": "लॉग आउट",
+    "Language": "भाषा"
+  },
+  "Dashboard": {
+    "Welcome": "वापसी पर स्वागत है",
+    "Statistics": "आँकड़े"
+  },
+  "Planner": {
+    "Today's Tasks": "आज के कार्य",
+    "Upcoming Tasks": "आगामी कार्य",
+    "Completed": "पूरा हुआ",
+    "Pending": "लंबित",
+    "Add Task": "कार्य जोड़ें",
+    "Edit Task": "संपादित करें",
+    "Delete Task": "हटाएं",
+    "Schedule": "अनुसूची",
+    "Calendar": "कैलेंडर",
+    "Reminders": "अनुस्मारक",
+    "Goals": "लक्ष्य"
+  },
+  "Subjects": {
+    "Mathematics": "गणित",
+    "Physics": "भौतिक विज्ञान",
+    "Chemistry": "रसायन विज्ञान",
+    "Biology": "जीव विज्ञान",
+    "History": "इतिहास"
+  },
+  "PYQ": {
+    "Previous Year Questions": "पिछले वर्ष के प्रश्न",
+    "Filters": "फ़िल्टर",
+    "Search": "खोजें",
+    "Difficulty": "कठिनाई",
+    "Easy": "आसान",
+    "Medium": "मध्यम",
+    "Hard": "कठिन",
+    "Solution": "समाधान",
+    "Explanation": "व्याख्या",
+    "Bookmark": "बुकमार्क",
+    "Attempt": "प्रयास करें",
+    "Correct Answer": "सही उत्तर",
+    "Time": "समय",
+    "Year": "वर्ष",
+    "Exam": "परीक्षा",
+    "Topic": "विषय",
+    "Chapter": "अध्याय",
+    "Marks": "अंक",
+    "Negative Marks": "नकारात्मक अंक"
+  },
+  "MockTests": {
+    "Start Test": "टेस्ट शुरू करें",
+    "Resume": "फिर से शुरू करें",
+    "Submit": "जमा करें",
+    "Next": "अगला",
+    "Previous": "पिछला",
+    "Review": "समीक्षा करें",
+    "Finish": "समाप्त करें",
+    "Score": "स्कोर",
+    "Accuracy": "सटीकता",
+    "Time Remaining": "शेष समय"
+  },
+  "AI": {
+    "AI Notes": "एआई नोट्स",
+    "AI Summary": "एआई सारांश",
+    "AI Explanation": "एआई व्याख्या",
+    "AI Quiz": "एआई क्विज",
+    "AI Flashcards": "एआई फ्लैशकार्ड",
+    "AI Roadmap": "एआई रोडमैप",
+    "AI Study Planner": "एआई स्टडी प्लानर",
+    "AI Doubt Solver": "एआई डाउट सॉल्वर"
+  },
+  "Auth": {
+    "Login": "लॉग इन",
+    "Register": "रजिस्टर",
+    "Forgot Password": "पासवर्ड भूल गए",
+    "Email": "ईमेल",
+    "Password": "पासवर्ड",
+    "Confirm Password": "पासवर्ड की पुष्टि करें",
+    "Continue": "जारी रखें",
+    "Sign In": "साइन इन",
+    "Sign Up": "साइन अप"
+  },
+  "Settings": {
+    "Language": "भाषा",
+    "Theme": "थीम",
+    "Notifications": "सूचनाएं",
+    "Privacy": "गोपनीयता",
+    "Security": "सुरक्षा",
+    "Account": "खाता",
+    "AI Settings": "एआई सेटिंग्स",
+    "Delete Account": "खाता हटाएं"
+  },
+  "Errors": {
+    "Network Error": "नेटवर्क त्रुटि",
+    "Invalid Password": "अमान्य पासवर्ड",
+    "Login Failed": "लॉगिन विफल",
+    "Saved Successfully": "सफलतापूर्वक सहेजा गया",
+    "Something Went Wrong": "कुछ गलत हो गया",
+    "Loading...": "लोड हो रहा है...",
+    "Retry": "पुनः प्रयास करें"
+  },
+  "Notifications": {
+    "Success": "सफलता",
+    "Warning": "चेतावनी",
+    "Error": "त्रुटि",
+    "Information": "जानकारी"
+  },
+  "Buttons": {
+    "Save": "सहेजें",
+    "Cancel": "रद्द करें",
+    "Delete": "हटाएं",
+    "Edit": "संपादित करें",
+    "Continue": "जारी रखें",
+    "Start": "शुरू करें",
+    "Finish": "समाप्त करें",
+    "Next": "अगला",
+    "Previous": "पिछला",
+    "Download": "डाउनलोड",
+    "Upload": "अपलोड",
+    "Generate": "उत्पन्न करें",
+    "Refresh": "रिफ्रेश करें",
+    "Retry": "पुनः प्रयास करें"
+  }
+}

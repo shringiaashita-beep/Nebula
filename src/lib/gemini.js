@@ -1,25 +1,10 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import supabase from "./supabase";
+import { getLanguageConfig } from "../config/languages";
 
-const genAI = new GoogleGenerativeAI(
-  import.meta.env.VITE_GEMINI_API_KEY
-);
-
-const model = genAI.getGenerativeModel({
-  model: "gemini-2.5-flash",
-});
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/api/ai";
 
 const parseGeminiError = (error) => {
   console.error("Gemini API error:", error);
-
-  if (
-    error?.message?.includes("quota") ||
-    error?.message?.includes("Quota")
-  ) {
-    return new Error(
-      "AI quota exceeded. Please wait for the quota to reset or upgrade your Gemini plan."
-    );
-  }
-
   return error;
 };
 
@@ -41,38 +26,107 @@ const parseJsonResponse = (text) => {
       const start = cleaned.indexOf("[");
       const end = cleaned.lastIndexOf("]");
 
-      if (
-        start !== -1 &&
-        end !== -1 &&
-        end > start
-      ) {
-        let jsonText = cleaned.slice(
-          start,
-          end + 1
-        );
-
-        jsonText = jsonText.replace(
-          /\\(?!["\\/bfnrtu])/g,
-          "\\\\"
-        );
-
+      if (start !== -1 && end !== -1 && end > start) {
+        let jsonText = cleaned.slice(start, end + 1);
+        jsonText = jsonText.replace(/\\(?!["\\/bfnrtu])/g, "\\\\");
         return JSON.parse(jsonText);
       }
     } catch (secondError) {
-      console.error(
-        "JSON Parse Error:",
-        secondError
-      );
+      console.error("JSON Parse Error:", secondError);
     }
+    console.error("Original Gemini Response:", text);
+    throw new Error("AI returned invalid JSON. Please try again.");
+  }
+};
 
-    console.error(
-      "Original Gemini Response:",
-      text
-    );
+/**
+ * Generic function to call the backend proxy.
+ */
+const generateFromBackend = async (prompt) => {
+  const { data: { session }, error } = await supabase.auth.getSession();
+  
+  if (error || !session) {
+    throw new Error("You must be logged in to use AI features.");
+  }
 
-    throw new Error(
-      "AI returned invalid JSON. Please try again."
-    );
+  // Fetch language preference
+  let finalPrompt = prompt;
+  try {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("language_preference")
+      .eq("id", session.user.id)
+      .single();
+
+    if (profile && profile.language_preference) {
+      const languageId = profile.language_preference.toLowerCase();
+      if (languageId !== "english") {
+        const langConfig = getLanguageConfig(languageId);
+        finalPrompt = prompt + `\n\nIMPORTANT LANGUAGE REQUIREMENT: ${langConfig.promptInstruction}`;
+      }
+    }
+  } catch (err) {
+    console.error("Error fetching language pref:", err);
+  }
+
+  const response = await fetch(`${BACKEND_URL}/generate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${session.access_token}`
+    },
+    body: JSON.stringify({
+      prompt: finalPrompt,
+      provider: "gemini",
+      modelName: "gemini-2.5-flash"
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to generate content");
+  }
+
+  return data.text;
+};
+
+export const translateContent = async (textToTranslate, targetLanguageId) => {
+  const langConfig = getLanguageConfig(targetLanguageId.toLowerCase());
+  
+  const prompt = `
+Translate the following study notes exactly according to these rules:
+1. Preserve all markdown formatting, bullet points, headings, and math equations (LaTeX).
+2. ${langConfig.promptInstruction}
+
+Text to translate:
+${textToTranslate}
+`;
+
+  try {
+    // We bypass generateFromBackend's internal injection to tightly control the prompt here
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) {
+      throw new Error("You must be logged in to translate content.");
+    }
+    const response = await fetch(`${BACKEND_URL}/generate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${session.access_token}`
+      },
+      body: JSON.stringify({
+        prompt,
+        provider: "gemini",
+        modelName: "gemini-2.5-flash"
+      })
+    });
+    
+    if (!response.ok) throw new Error("Translation failed.");
+    const data = await response.json();
+    return data.text;
+  } catch (error) {
+    throw parseGeminiError(error);
   }
 };
 
@@ -107,8 +161,7 @@ Practice problems.
 `;
 
   try {
-    const result = await model.generateContent(prompt);
-    return result.response.text();
+    return await generateFromBackend(prompt);
   } catch (error) {
     throw parseGeminiError(error);
   }
@@ -123,8 +176,7 @@ One topic per line.
 `;
 
   try {
-    const result = await model.generateContent(prompt);
-    return result.response.text();
+    return await generateFromBackend(prompt);
   } catch (error) {
     throw parseGeminiError(error);
   }
@@ -144,8 +196,7 @@ Rules:
 `;
 
   try {
-    const result = await model.generateContent(prompt);
-    return result.response.text();
+    return await generateFromBackend(prompt);
   } catch (error) {
     throw parseGeminiError(error);
   }
@@ -177,9 +228,8 @@ Format structure:
 `;
 
   try {
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
-    console.log("Gemini Questions Response:", responseText);
+    const responseText = await generateFromBackend(prompt);
+
     return parseJsonResponse(responseText);
   } catch (error) {
     throw parseGeminiError(error);
@@ -219,8 +269,8 @@ JSON Format:
 `;
 
   try {
-    const result = await model.generateContent(prompt);
-    return parseJsonResponse(result.response.text());
+    const responseText = await generateFromBackend(prompt);
+    return parseJsonResponse(responseText);
   } catch (error) {
     throw parseGeminiError(error);
   }
@@ -247,8 +297,8 @@ JSON Format:
 `;
 
   try {
-    const result = await model.generateContent(prompt);
-    return parseJsonResponse(result.response.text());
+    const responseText = await generateFromBackend(prompt);
+    return parseJsonResponse(responseText);
   } catch (error) {
     throw parseGeminiError(error);
   }
@@ -277,8 +327,8 @@ JSON Format:
 `;
 
   try {
-    const result = await model.generateContent(prompt);
-    return parseJsonResponse(result.response.text());
+    const responseText = await generateFromBackend(prompt);
+    return parseJsonResponse(responseText);
   } catch (error) {
     throw parseGeminiError(error);
   }
@@ -298,8 +348,7 @@ Be clear, educational, and detailed.
 `;
 
   try {
-    const result = await model.generateContent(prompt);
-    return result.response.text();
+    return await generateFromBackend(prompt);
   } catch (error) {
     throw parseGeminiError(error);
   }
@@ -323,8 +372,7 @@ Keep it motivating and highly educational.
 `;
 
   try {
-    const result = await model.generateContent(prompt);
-    return result.response.text();
+    return await generateFromBackend(prompt);
   } catch (error) {
     throw parseGeminiError(error);
   }
@@ -357,8 +405,8 @@ STRICT RULES:
 `;
 
   try {
-    const result = await model.generateContent(prompt);
-    return parseJsonResponse(result.response.text());
+    const responseText = await generateFromBackend(prompt);
+    return parseJsonResponse(responseText);
   } catch (error) {
     throw parseGeminiError(error);
   }
@@ -392,8 +440,8 @@ Do NOT write markdown wrap. Do NOT write anything else.
 `;
 
   try {
-    const result = await model.generateContent(prompt);
-    return parseJsonResponse(result.response.text());
+    const responseText = await generateFromBackend(prompt);
+    return parseJsonResponse(responseText);
   } catch (err) {
     console.error("Translation failed:", err);
     return null;

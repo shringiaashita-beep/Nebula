@@ -19,7 +19,7 @@ function DailyQuests() {
   // ── All Supabase logic untouched ────────────────────────────
   const fetchQuests = async () => {
     const { data, error } = await supabase.from("daily_quests").select("*");
-    if (error) { console.log(error); return; }
+    if (error) { console.error("DailyQuests fetch error:", error); return; }
     setQuests(data || []);
   };
 
@@ -58,7 +58,9 @@ function DailyQuests() {
       completed: true,
       completed_at: new Date(),
     }]);
-    console.log("QUEST ERROR:", questError);
+    if (questError) {
+      console.error("QUEST ERROR:", questError);
+    }
 
     setClaimed((prev) => [...prev, quest.id]);
     showToast(`🎉 Reward Claimed! +${quest.reward_xp} XP`, "success");

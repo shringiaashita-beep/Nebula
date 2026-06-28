@@ -6,8 +6,10 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import MathRenderer from "./MathRenderer";
+import { useTranslation } from "react-i18next";
 
 function PYQQuiz({ exam, subject }) {
+  const { t } = useTranslation();
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -44,7 +46,7 @@ function PYQQuiz({ exam, subject }) {
   const loadQuestions = async () => {
     try {
       setLoading(true);
-      console.log("Exam Prop:", exam, "Subject Prop:", subject);
+
       
       let query = supabase
         .from("pyq_questions")
@@ -58,12 +60,12 @@ function PYQQuiz({ exam, subject }) {
       let { data, error } = await query.order("question_no");
 
       if (error) {
-        console.log(error);
+        console.error(error);
         return;
       }
 
       if (!data || data.length === 0) {
-        console.log("No questions found in Supabase for:", exam, "subject:", subject);
+
         setQuestions([]);
         setLoading(false);
         return;
@@ -84,7 +86,7 @@ function PYQQuiz({ exam, subject }) {
         explanation: "",
       }));
 
-      console.log("Questions:", formattedQuestions);
+
       setQuestions(formattedQuestions);
     } catch (error) {
       console.error("PYQ ERROR:", error);
@@ -365,7 +367,7 @@ Student Query: ${userMessage}
                     boxShadow: "0 0 20px rgba(16,185,129,0.2)"
                   }}
                 >
-                  Submit Practice Set
+                  {t("Buttons.Finish")}
                 </button>
               )}
             </div>

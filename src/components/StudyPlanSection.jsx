@@ -1,15 +1,20 @@
 import { useState, useEffect } from "react";
 import supabase from "../lib/supabase";
+import { useTranslation } from "react-i18next";
 
 function StudyPlanSection() {
+  const { t } = useTranslation();
   const [hoursPerDay, setHoursPerDay] = useState(4);
   const [studyPlan, setStudyPlan] = useState([]);
   const [savedPlans, setSavedPlans] = useState([]);
   const [infoMsg, setInfoMsg] = useState("");
+  const [infoType, setInfoType] = useState("success");
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  const showInfo = (msg) => {
+  const showInfo = (msg, type = "success") => {
     setInfoMsg(msg);
-    setTimeout(() => setInfoMsg(""), 3000);
+    setInfoType(type);
+    setTimeout(() => setInfoMsg(""), 4000);
   };
 
   useEffect(() => {
@@ -31,8 +36,7 @@ function StudyPlanSection() {
         ascending: false,
       });
 
-    console.log("FETCH SAVED PLANS:", data);
-    console.log("FETCH ERROR:", error);
+
 
     if (!error) {
       setSavedPlans(data || []);
@@ -40,32 +44,30 @@ function StudyPlanSection() {
   };
 
   const generatePlan = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    if (isGenerating) return;
+    setIsGenerating(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user) {
-      alert("User not logged in");
-      return;
-    }
+      if (!user) {
+        showInfo("⚠️ User not logged in. Please refresh and try again.", "error");
+        return;
+      }
 
-    const { data: exams, error } = await supabase
-      .from("exams")
-      .select("*")
-      .eq("user_id", user.id);
+      const { data: exams, error } = await supabase
+        .from("exams")
+        .select("*")
+        .eq("user_id", user.id);
 
-    console.log("EXAMS:", exams);
-    console.log("EXAMS ERROR:", error);
+      if (error) {
+        showInfo("⚠️ " + error.message, "error");
+        return;
+      }
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    if (!exams || exams.length === 0) {
-      alert("Add exams first");
-      return;
-    }
+      if (!exams || exams.length === 0) {
+        showInfo("⚠️ No exams found. Add your exams first in the Exams section.", "error");
+        return;
+      }
 
     const today = new Date();
 
@@ -119,8 +121,11 @@ function StudyPlanSection() {
       }
     );
 
-    setStudyPlan(generated);
-    showInfo("✓ Plan generated successfully!");
+      setStudyPlan(generated);
+      showInfo("✅ Study plan generated successfully!");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const savePlan = async () => {
@@ -150,7 +155,7 @@ function StudyPlanSection() {
         ]);
 
       if (error) {
-        console.log(error);
+        console.error(error);
       }
     }
 
@@ -204,15 +209,7 @@ function StudyPlanSection() {
       ])
       .select();
 
-    console.log(
-      "SESSION DATA:",
-      sessionData
-    );
 
-    console.log(
-      "SESSION ERROR:",
-      sessionError
-    );
 
     if (sessionError) { showInfo(sessionError.message); }
   }
@@ -227,7 +224,7 @@ function StudyPlanSection() {
       .eq("id", id);
 
     if (error) {
-      alert(error.message);
+      showInfo("⚠️ " + error.message, "error");
       return;
     }
 
@@ -273,7 +270,7 @@ function StudyPlanSection() {
       {/* ── Planner header ──────────────────────────────── */}
       <div className="arc-card p-6 space-y-5" style={{ borderTop: "2px solid var(--arc-gold-500)" }}>
         <div>
-          <h2 className="arc-font-display text-2xl font-bold arc-text-gradient">⚡ Smart AI Study Planner</h2>
+          <h2 className="arc-font-display text-2xl font-bold arc-text-gradient">⚡ {t("Navigation.Study Planner")}</h2>
           <p className="text-sm mt-1" style={{ color: "var(--arc-text-secondary)" }}>Generate a personalised plan based on your exam schedule</p>
         </div>
 
@@ -308,8 +305,8 @@ function StudyPlanSection() {
             />
           </div>
           <div className="flex gap-2">
-            <button onClick={generatePlan} className="arc-btn-gold px-5 py-2.5 text-sm rounded-xl">Generate Plan</button>
-            <button onClick={savePlan}     className="arc-btn-ghost px-5 py-2.5 text-sm rounded-xl">Save Plan</button>
+            <button onClick={generatePlan} className="arc-btn-gold px-5 py-2.5 text-sm rounded-xl">{t("Buttons.Generate")}</button>
+            <button onClick={savePlan}     className="arc-btn-ghost px-5 py-2.5 text-sm rounded-xl">{t("Buttons.Save")}</button>
           </div>
         </div>
 
@@ -329,7 +326,7 @@ function StudyPlanSection() {
       {/* ── Today's Mission ─────────────────────────────── */}
       {todayMission && (
         <div className="arc-card p-5" style={{ border: "1px solid rgba(212,175,55,0.3)", background: "rgba(212,175,55,0.05)" }}>
-          <h3 className="arc-font-display text-lg font-bold arc-text-gold mb-3">🎯 Today's Mission</h3>
+          <h3 className="arc-font-display text-lg font-bold arc-text-gold mb-3">🎯 {t("Planner.Today's Tasks")}</h3>
           <div className="grid sm:grid-cols-2 gap-2 text-sm">
             {[
               ["📚 Subject", todayMission.subject],
@@ -408,7 +405,7 @@ function StudyPlanSection() {
                   style={{ color: "var(--arc-error)", borderColor: "rgba(239,68,68,0.2)" }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.08)"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}>
-                  Delete
+                  {t("Buttons.Delete")}
                 </button>
               </div>
             </div>

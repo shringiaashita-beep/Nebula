@@ -28,7 +28,7 @@ export const pyqApi = {
     language,
     questionType,
     page = 1,
-    limit = 15
+    limit = 10
   } = {}) {
     try {
       const from = (page - 1) * limit;
@@ -61,7 +61,7 @@ export const pyqApi = {
   /**
    * Instant search using PostgreSQL text indexing
    */
-  async searchQuestions(searchQuery, { exam, subject, page = 1, limit = 15 } = {}) {
+  async searchQuestions(searchQuery, { exam, subject, page = 1, limit = 10 } = {}) {
     try {
       const from = (page - 1) * limit;
       const to = from + limit - 1;
