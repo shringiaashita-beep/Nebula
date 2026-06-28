@@ -39,7 +39,13 @@ async function getDecryptedApiKey(userId, authHeader, provider = "gemini") {
 router.post("/generate", async (req, res) => {
   let apiKey = null;
   try {
-    const { prompt, modelName = "gemini-2.5-flash", provider = "gemini" } = req.body;
+   const {
+  prompt,
+  provider = "gemini",
+} = req.body;
+
+const modelName =
+  process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
     if (!prompt) {
       return res.status(400).json({ error: "Prompt is required." });
