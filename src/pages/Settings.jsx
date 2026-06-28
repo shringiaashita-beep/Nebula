@@ -19,7 +19,10 @@ export default function Settings() {
   const [langMessage, setLangMessage] = useState({ type: "", text: "" });
 
   const API_URL = import.meta.env.VITE_API_URL;
-const BACKEND_URL = `${API_URL}/api/keys`;
+
+  console.log("API_URL =", API_URL);
+
+  const BACKEND_URL = `${API_URL}/api/keys`;
 
   useEffect(() => {
     fetchSettings();
