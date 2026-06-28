@@ -10,26 +10,40 @@ const app = express();
 
 // Security Middleware
 app.use(helmet());
-app.use(cors());
+
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://nebula-eta-three.vercel.app",
+      // Add your custom domain here later
+      // "https://nebula.study"
+    ],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 // Rate Limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: "Too many requests from this IP, please try again later."
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: "Too many requests from this IP, please try again later.",
 });
+
 app.use("/api/", limiter);
 
-// Mount Routes
+// Routes
 app.use("/api/keys", apiKeysRouter);
 app.use("/api/ai", aiRouter);
 
 app.get("/", (req, res) => {
-  res.send("AI Study Planner API Running - Secure BYOK Enabled");
+  res.send("Nebula Backend API Running 🚀");
 });
 
-const PORT = 5000;
+// IMPORTANT FOR RENDER
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
