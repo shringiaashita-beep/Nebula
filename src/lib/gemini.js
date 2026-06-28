@@ -1,7 +1,7 @@
 import supabase from "./supabase";
 import { getLanguageConfig } from "../config/languages";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/api/ai";
+const BACKEND_URL = `${import.meta.env.VITE_API_URL}/api/ai`;
 
 const parseGeminiError = (error) => {
   console.error("Gemini API error:", error);
