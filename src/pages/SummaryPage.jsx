@@ -321,6 +321,24 @@ function SummaryPage() {
         <h2 className="text-2xl font-bold arc-font-display text-center" style={{ color: "var(--arc-text-hero)" }}>
           ❓ Frequently Asked Questions
         </h2>
+
+        {/* Quota Disclaimer */}
+        <div className="rounded-2xl border border-amber-500/40 bg-amber-900/20 p-5 flex items-start gap-4">
+          <span className="text-2xl shrink-0">⚠️</span>
+          <div className="space-y-1.5">
+            <p className="font-black text-amber-400 text-sm">Important: API Quota Limit Notice</p>
+            <p className="text-xs text-amber-200/90 leading-relaxed">
+              The free Google Gemini API has a <strong>limited daily quota</strong>. Please <strong>do not click AI generation buttons (Notes, Mind Map, Quick Revision) more than 15 times per day</strong> to avoid exhausting your free quota.
+            </p>
+            <p className="text-xs text-amber-200/90 leading-relaxed">
+              If notes, mind maps, or revision packs <strong>do not appear</strong> — your free daily quota has likely been consumed. It resets automatically the next day. There is no need to panic.
+            </p>
+            <p className="text-xs text-amber-300/60 italic mt-2">
+              📌 Nebula is not responsible for content not loading due to Google API quota limits. This is a restriction of the free tier provided by Google, not a bug in this app. Manage your AI clicks wisely.
+            </p>
+          </div>
+        </div>
+
         <div className="space-y-3">
           {FAQS.map((faq, i) => (
             <div

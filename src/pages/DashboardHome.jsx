@@ -54,6 +54,21 @@ function DashboardHome({
         </div>
       )}
 
+      {/* Quota Warning Banner */}
+      <div className="bg-amber-900/25 border border-amber-500/40 rounded-2xl p-4 flex items-start gap-3 text-amber-200 text-xs sm:text-sm backdrop-blur-md">
+        <span className="text-xl shrink-0 mt-0.5">⚠️</span>
+        <div className="space-y-1">
+          <p className="font-bold text-amber-400 text-sm">API Quota Disclaimer — Please Read</p>
+          <p className="leading-relaxed text-amber-200/90">
+            The free Google Gemini API key has a <strong>limited daily quota</strong>. Please <strong>do not click AI generation buttons (Notes, Mind Map, Revision) more than 15 times per day</strong>. If content does not appear, your free quota may be exhausted for the day — it resets automatically the next day.
+          </p>
+          <p className="text-amber-300/70 text-xs mt-1">
+            📌 <em>Nebula is not responsible for content not loading due to API quota limits. Manage your usage wisely. Visit the Summary tab for full details.</em>
+          </p>
+        </div>
+      </div>
+
+
       {/* Main Dashboard Layout Split: 2/3 Main Content, 1/3 Sidebar Stats */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* Main Content Area (2/3 width) */}
