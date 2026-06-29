@@ -145,6 +145,20 @@ function MindMap({ subject, topic, onClose }) {
     );
   };
 
+  if (mindmap === "Loading..." || mindmap === "Generating Mind Map...") {
+    return (
+      <div className="border p-8 rounded-2xl mt-3 bg-slate-900/40 border-slate-800 text-center space-y-4 shadow-xl backdrop-blur-sm animate-pulse">
+        <div className="w-10 h-10 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin mx-auto"></div>
+        <p className="text-sm font-semibold text-white">
+          🧠 AI is designing your interactive Mind Map...
+        </p>
+        <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+          Please wait. Organising topics and branches into a beautiful visual concept map takes about 15-30 seconds. The site is actively working on it!
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div
       className="border p-6 rounded-2xl mt-3"

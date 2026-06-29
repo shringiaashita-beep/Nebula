@@ -154,8 +154,14 @@ function TopicNotes({
 
   if (loading) {
     return (
-      <div className="mt-4">
-        Loading Notes...
+      <div className="border p-8 rounded-2xl mt-4 bg-slate-900/40 border-slate-800 text-center space-y-4 shadow-xl backdrop-blur-sm animate-pulse">
+        <div className="w-10 h-10 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin mx-auto"></div>
+        <p className="text-sm font-semibold text-white">
+          🤖 AI is generating your comprehensive notes...
+        </p>
+        <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+          Please wait. Generating high-quality educational notes, derivations, and practice exercises takes about 15-30 seconds. The site is actively working on it!
+        </p>
       </div>
     );
   }

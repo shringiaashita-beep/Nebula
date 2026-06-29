@@ -32,8 +32,14 @@ function QuickRevision({
 
   if (loading) {
     return (
-      <div className="mt-4">
-        Generating Revision Pack...
+      <div className="border p-8 rounded-2xl mt-4 bg-slate-900/40 border-slate-800 text-center space-y-4 shadow-xl backdrop-blur-sm animate-pulse">
+        <div className="w-10 h-10 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin mx-auto"></div>
+        <p className="text-sm font-semibold text-white">
+          ⚡ AI is assembling your Quick Revision pack...
+        </p>
+        <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+          Please wait. Generating summaries, key flashcards, and concept maps takes about 15-30 seconds. The site is actively working on it!
+        </p>
       </div>
     );
   }

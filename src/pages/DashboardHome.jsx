@@ -11,6 +11,7 @@ function DashboardHome({
   setSelectedSubject,
 }) {
   const [showGalaxy, setShowGalaxy] = useState(true);
+  const [showAiNotice, setShowAiNotice] = useState(true);
 
   useEffect(() => {
     // Load preference from local storage without forcing it to true
@@ -38,6 +39,21 @@ function DashboardHome({
 
   return (
     <div className="space-y-8 lg:space-y-10 p-1">
+      {/* AI Processing Notice */}
+      {showAiNotice && (
+        <div className="bg-blue-900/30 border border-blue-500/30 rounded-2xl p-4 flex items-center justify-between gap-3 text-blue-300 text-xs sm:text-sm backdrop-blur-md">
+          <div className="flex items-center gap-3">
+            <span className="text-base sm:text-lg">🤖</span>
+            <p className="leading-relaxed">
+              <strong>Generation Notice:</strong> Creating AI notes, mind maps, or revision packs takes about 15-30 seconds. The site is actively working on it in the background, please wait for generation.
+            </p>
+          </div>
+          <button onClick={() => setShowAiNotice(false)} className="text-slate-400 hover:text-white font-bold text-xs p-1 shrink-0">
+            ✖
+          </button>
+        </div>
+      )}
+
       {/* Main Dashboard Layout Split: 2/3 Main Content, 1/3 Sidebar Stats */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* Main Content Area (2/3 width) */}
