@@ -8,6 +8,10 @@ export default function MathRenderer({ text }) {
 
   let content = text;
 
+  // Convert standard AI math delimiters to markdown-math delimiters (\( -> $, \[ -> $$)
+  content = content.replace(/\\\[/g, "$$").replace(/\\\]/g, "$$");
+  content = content.replace(/\\\(/g, "$").replace(/\\\)/g, "$");
+
   content = content.replace(
     /\\begin\{bmatrix\}([\s\S]*?)\\end\{bmatrix\}/g,
     (_, matrix) => {
@@ -17,12 +21,12 @@ export default function MathRenderer({ text }) {
 
   content = content.replace(
     /\\frac\{([^}]*)\}\{([^}]*)\}/g,
-    (_, a, b) => `$\\\\frac{${a}}{${b}}$`
+    (_, a, b) => `$\\frac{${a}}{${b}}$`
   );
 
   content = content.replace(
     /\\sqrt\{([^}]*)\}/g,
-    (_, a) => `$\\\\sqrt{${a}}$`
+    (_, a) => `$\\sqrt{${a}}$`
   );
 
   return (
