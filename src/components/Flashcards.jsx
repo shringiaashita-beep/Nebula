@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import supabase from "../lib/supabase";
 import { generateFlashcards } from "../lib/gemini";
+import MathRenderer from "./MathRenderer";
 
 function Flashcards({ subject, topic, onClose }) {
   const [cards, setCards] = useState([]);
@@ -58,16 +59,16 @@ function Flashcards({ subject, topic, onClose }) {
       return (
         <ul className="list-disc pl-5 mt-3 space-y-1 text-sm leading-relaxed" style={{ color: "var(--arc-text-secondary)" }}>
           {lines.map((line, idx) => (
-            <li key={idx}>{line}</li>
+            <li key={idx}><MathRenderer text={line} /></li>
           ))}
         </ul>
       );
     }
 
     return (
-      <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--arc-text-secondary)" }}>
-        {answerText}
-      </p>
+      <div className="mt-3 text-sm leading-relaxed" style={{ color: "var(--arc-text-secondary)" }}>
+        <MathRenderer text={answerText} />
+      </div>
     );
   };
 
@@ -102,9 +103,10 @@ function Flashcards({ subject, topic, onClose }) {
           borderColor: "var(--arc-border)"
         }}
       >
-        <p className="font-semibold text-base" style={{ color: "var(--arc-text-primary)" }}>
-          Q: {cards[current].question}
-        </p>
+        <div className="font-semibold text-base flex gap-1.5 items-start" style={{ color: "var(--arc-text-primary)" }}>
+          <span className="shrink-0">Q:</span>
+          <MathRenderer text={cards[current].question} />
+        </div>
 
         {showAnswer && renderAnswer(cards[current].answer)}
       </div>

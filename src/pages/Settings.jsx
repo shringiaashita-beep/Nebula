@@ -307,9 +307,9 @@ export default function Settings() {
                   </div>
                   
                   {keyStatus.exists && keyStatus.masked_key && (
-                    <div className="flex justify-between items-center pb-4 border-b border-gray-800">
-                      <span className="text-gray-400 whitespace-nowrap mr-4">Active Key</span>
-                      <span className="text-gray-200 font-mono text-sm tracking-wider truncate text-right" title={keyStatus.masked_key}>
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 pb-4 border-b border-gray-800">
+                      <span className="text-gray-400">Active Key</span>
+                      <span className="text-gray-200 font-mono text-xs tracking-wider break-all text-left sm:text-right" title={keyStatus.masked_key}>
                         {keyStatus.masked_key}
                       </span>
                     </div>

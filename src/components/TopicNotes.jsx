@@ -9,6 +9,7 @@ import {
 import ReactMarkdown from "react-markdown";
 import { getLanguageConfig, LANGUAGES } from "../config/languages";
 import { useTranslation } from "react-i18next";
+import MathRenderer from "./MathRenderer";
 
 function TopicNotes({
   subject,
@@ -270,9 +271,7 @@ function TopicNotes({
           borderColor: "var(--arc-border)"
         }}
       >
-        <ReactMarkdown>
-          {activeContent}
-        </ReactMarkdown>
+        <MathRenderer text={activeContent} />
       </div>
 
       <div className="mt-8 border-t pt-6" style={{ borderColor: "var(--arc-border)" }}>
@@ -305,8 +304,8 @@ function TopicNotes({
             <h4 className="font-semibold mb-2 text-blue-400">
               AI Answer
             </h4>
-            <div className="whitespace-pre-wrap">
-              {answer}
+            <div className="text-slate-200 mt-2 leading-relaxed">
+              <MathRenderer text={answer} />
             </div>
           </div>
         )}

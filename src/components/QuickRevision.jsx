@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { generateRevisionPack } from "../lib/gemini";
+import MathRenderer from "./MathRenderer";
 
 function QuickRevision({
   subject,
@@ -46,16 +47,22 @@ function QuickRevision({
   }
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl p-6 mt-6">
-
+    <div
+      className="border p-6 rounded-2xl mt-4"
+      style={{
+        background: "var(--arc-bg-surface)",
+        borderColor: "var(--arc-border)",
+        color: "var(--arc-text-primary)"
+      }}
+    >
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-3xl font-bold">
+        <h2 className="text-2xl font-bold" style={{ color: "var(--arc-text-hero)" }}>
           ⚡ Quick Revision
         </h2>
         {onClose && (
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-red-500 bg-red-50 border border-red-200 hover:bg-red-500 hover:text-white transition-colors"
+            className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:text-white transition-colors"
             title="Close"
           >
             ✖
@@ -63,15 +70,15 @@ function QuickRevision({
         )}
       </div>
 
-      <h3 className="text-xl font-semibold mb-2">
+      <h3 className="text-lg font-semibold mb-2" style={{ color: "var(--arc-gold-400)" }}>
         📖 Summary
       </h3>
 
-      <p className="mb-6">
-        {data.summary}
-      </p>
+      <div className="mb-6 text-sm leading-relaxed" style={{ color: "var(--arc-text-secondary)" }}>
+        <MathRenderer text={data.summary} />
+      </div>
 
-      <h3 className="text-xl font-semibold mb-3">
+      <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--arc-gold-400)" }}>
         📚 Flashcards
       </h3>
 
@@ -80,25 +87,24 @@ function QuickRevision({
           (card, index) => (
             <div
               key={index}
-              className="border rounded-2xl p-4"
+              className="border rounded-xl p-4 bg-black/25"
+              style={{ borderColor: "var(--arc-border)" }}
             >
-              <p className="font-semibold">
-                Q:
-                {" "}
-                {card.question}
-              </p>
+              <div className="font-semibold text-sm flex gap-1.5 items-start" style={{ color: "var(--arc-text-primary)" }}>
+                <span className="shrink-0">Q:</span>
+                <MathRenderer text={card.question} />
+              </div>
 
-              <p className="text-slate-600 mt-2">
-                A:
-                {" "}
-                {card.answer}
-              </p>
+              <div className="text-sm mt-2 flex gap-1.5 items-start" style={{ color: "var(--arc-text-secondary)" }}>
+                <span className="shrink-0 font-semibold text-slate-500">A:</span>
+                <MathRenderer text={card.answer} />
+              </div>
             </div>
           )
         )}
       </div>
 
-      <h3 className="text-xl font-semibold mb-3">
+      <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--arc-gold-400)" }}>
         🧠 Mind Map
       </h3>
 
@@ -110,13 +116,14 @@ function QuickRevision({
           ) => (
             <div
               key={index}
-              className="border rounded-2xl p-4"
+              className="border rounded-xl p-4 bg-black/25"
+              style={{ borderColor: "var(--arc-border)" }}
             >
-              <h4 className="font-bold">
-                {branch.title}
+              <h4 className="font-bold text-sm mb-2" style={{ color: "var(--arc-text-primary)" }}>
+                <MathRenderer text={branch.title} />
               </h4>
 
-              <ul className="list-disc ml-5 mt-2">
+              <ul className="list-disc ml-5 space-y-1 text-sm" style={{ color: "var(--arc-text-secondary)" }}>
                 {branch.points?.map(
                   (
                     point,
@@ -127,7 +134,7 @@ function QuickRevision({
                         pointIndex
                       }
                     >
-                      {point}
+                      <MathRenderer text={point} />
                     </li>
                   )
                 )}
