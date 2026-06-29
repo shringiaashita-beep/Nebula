@@ -689,7 +689,6 @@ fetchTopics();
                     <div className="py-1">
                       {[
                         { label: "📖 View Notes", action: () => setNotesTopic(topic) },
-                        { label: "🎴 Flashcards", action: () => setFlashcardTopic(topic) },
                         { label: "🧠 Mind Map", action: () => setMindMapTopic(topic) },
                         { label: "⚡ Quick Revision", action: () => setRevisionTopic(topic) },
                         { label: "🎯 Generate 30 Hard Questions", action: () => generateHardQuestionsForTopic(topic) },
