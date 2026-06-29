@@ -402,8 +402,8 @@ function PYQDatabase() {
             </button>
           </form>
 
-          {/* Filters Matrix */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-2.5">
+          {/* Filters Matrix - 1 col on mobile, 2 col on sm, 5 col on md+ */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
             <select
               value={filterExam}
               onChange={(e) => { setFilterExam(e.target.value); setCurrentPage(1); }}

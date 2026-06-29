@@ -90,7 +90,7 @@ function DashboardStats() {
 
       {/* ── Hero banner ──────────────────────────────────────── */}
       <div
-        className="relative overflow-hidden rounded-2xl p-7"
+        className="relative overflow-hidden rounded-2xl p-5 sm:p-7"
         style={{
           background: "var(--arc-bg-surface)",
           border: "1px solid var(--arc-border)",
@@ -137,8 +137,8 @@ function DashboardStats() {
         </div>
       </div>
 
-      {/* ── Metric pill row ───────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* ── Metric pill row ─────────────────────────────────── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {METRICS.map(({ label, value, sub, icon }) => (
           <div
             key={label}

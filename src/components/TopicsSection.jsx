@@ -549,8 +549,8 @@ fetchTopics();
         </p>
       </div>
 
-      {/* Inputs Grid */}
-      <div className="grid md:grid-cols-3 gap-3">
+      {/* Inputs Grid - stack on mobile */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
         <input
           type="text"
           placeholder="Subject"
@@ -633,7 +633,7 @@ fetchTopics();
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.2)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--arc-border)"; }}
           >
-            <div className="flex justify-between items-start">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
               <div className="space-y-1">
                 <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--arc-text-muted)" }}>
                   {topic.subject_name}
@@ -684,6 +684,8 @@ fetchTopics();
                       background: "var(--arc-bg-elevated)",
                       border: "1px solid var(--arc-border)",
                       boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+                      /* On very small screens keep inside viewport */
+                      maxWidth: "calc(100vw - 2rem)",
                     }}
                   >
                     <div className="py-1">

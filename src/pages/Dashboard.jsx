@@ -136,6 +136,15 @@ function Dashboard() {
     summary:   "About Nebula",
   };
 
+  // Bottom nav items (mobile only - 5 most used)
+  const BOTTOM_NAV = [
+    { id: "dashboard", icon: "⬡", label: "Home" },
+    { id: "subjects",  icon: "◈", label: "Subjects" },
+    { id: "pyq",       icon: "◎", label: "PYQ" },
+    { id: "progress",  icon: "◉", label: "Progress" },
+    { id: "summary",   icon: "📖", label: "Guide" },
+  ];
+
   return (
     <div className="min-h-screen flex arc-spotlight">
 
@@ -235,18 +244,18 @@ function Dashboard() {
           ════════════════════════════════════════════════════════ */}
       <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
 
-        {/* ── Top bar (mobile hamburger + page title) ───────── */}
+        {/* ── Top bar ───────── */}
         <header
-          className="sticky top-0 z-20 flex items-center justify-between px-5 py-4"
+          className="sticky top-0 z-20 flex items-center justify-between px-4 py-3 lg:px-5 lg:py-4"
           style={{
             background: "var(--arc-bg-surface)",
             backdropFilter: "blur(16px)",
             borderBottom: "1px solid var(--arc-border)",
           }}
         >
-          {/* Mobile menu toggle */}
+          {/* Mobile hamburger (shows sidebar on lg+; on mobile we use bottom nav but keep it for sidebar access) */}
           <button
-            className="lg:hidden arc-btn-ghost px-3 py-2 text-sm"
+            className="lg:hidden arc-btn-ghost px-2.5 py-1.5 text-base"
             onClick={() => setMobileOpen((p) => !p)}
             aria-label="Open navigation"
           >
@@ -254,45 +263,32 @@ function Dashboard() {
           </button>
 
           {/* Page title */}
-          <div className="flex items-center gap-3">
-            <h2
-              className="arc-font-display text-lg font-semibold arc-text-gradient hidden sm:block"
-            >
-              {PAGE_TITLES[activePage] || "Nebula"}
-            </h2>
-          </div>
+          <h2 className="arc-font-display text-sm sm:text-lg font-semibold arc-text-gradient truncate max-w-[140px] sm:max-w-none">
+            {PAGE_TITLES[activePage] || "Nebula"}
+          </h2>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {/* Quick Language Selector */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold" style={{ color: "var(--arc-text-muted)" }}>🌐</span>
-              <select
-                value={language}
-                onChange={(e) => handleLanguageChange(e.target.value)}
-                disabled={savingLang}
-                className="bg-transparent text-sm border border-gray-600 rounded-md px-2 py-1 outline-none cursor-pointer focus:border-blue-500 transition-colors"
-                style={{ color: "var(--arc-text-primary)", background: "var(--arc-bg-base)" }}
-                title="AI Content Language"
-              >
-                {LANGUAGES.map((lang) => (
-                  <option key={lang.id} value={lang.id}>
-                    {lang.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <select
+              value={language}
+              onChange={(e) => handleLanguageChange(e.target.value)}
+              disabled={savingLang}
+              className="bg-transparent text-xs sm:text-sm border border-gray-600 rounded-md px-1.5 sm:px-2 py-1 outline-none cursor-pointer focus:border-blue-500 transition-colors max-w-[90px] sm:max-w-none"
+              style={{ color: "var(--arc-text-primary)", background: "var(--arc-bg-base)" }}
+              title="AI Content Language"
+            >
+              {LANGUAGES.map((lang) => (
+                <option key={lang.id} value={lang.id}>{lang.label}</option>
+              ))}
+            </select>
             
-            {/* Gold accent dot — decorative */}
-            <div
-              className="w-2 h-2 rounded-full animate-pulse"
-              style={{ background: "var(--arc-gold-400)" }}
-              title="Live"
-            />
+            <div className="w-2 h-2 rounded-full animate-pulse hidden sm:block" style={{ background: "var(--arc-gold-400)" }} title="Live" />
           </div>
         </header>
 
         {/* ── Page content ─────────────────────────────────── */}
-        <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
+        {/* pb-20 on mobile = space above bottom nav bar */}
+        <main className="flex-1 p-3 sm:p-4 md:p-8 overflow-x-hidden pb-24 lg:pb-8">
           
           {showWelcomeBanner && (
             <div className="mb-6 p-4 rounded-xl border flex justify-between items-start animate-fade-in" 
@@ -342,6 +338,36 @@ function Dashboard() {
         </main>
       </div>
 
+      {/* ════════════════════════════════════════════════════════
+          MOBILE BOTTOM NAVIGATION BAR (hidden on lg+)
+          ════════════════════════════════════════════════════════ */}
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-50 lg:hidden flex items-center justify-around border-t"
+        style={{
+          background: "var(--arc-bg-surface)",
+          borderColor: "var(--arc-border)",
+          backdropFilter: "blur(20px)",
+          paddingBottom: "env(safe-area-inset-bottom, 0px)",
+        }}
+      >
+        {BOTTOM_NAV.map(({ id, icon, label }) => (
+          <button
+            key={id}
+            onClick={() => handleNav(id)}
+            className="flex flex-col items-center justify-center gap-0.5 py-2.5 px-3 flex-1 transition-all duration-200"
+            style={{
+              color: activePage === id ? "var(--arc-gold-400)" : "var(--arc-text-muted)",
+              fontSize: "10px",
+            }}
+          >
+            <span className="text-lg leading-none" style={{ filter: activePage === id ? "drop-shadow(0 0 6px rgba(212,175,55,0.6))" : "none" }}>{icon}</span>
+            <span className="font-semibold tracking-wide" style={{ fontSize: "9px" }}>{label}</span>
+            {activePage === id && (
+              <span className="absolute bottom-0 w-8 h-0.5 rounded-full" style={{ background: "var(--arc-gold-400)" }} />
+            )}
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }
