@@ -12,23 +12,6 @@ export default function MathRenderer({ text }) {
   content = content.replace(/\\\[/g, "$$").replace(/\\\]/g, "$$");
   content = content.replace(/\\\(/g, "$").replace(/\\\)/g, "$");
 
-  content = content.replace(
-    /\\begin\{bmatrix\}([\s\S]*?)\\end\{bmatrix\}/g,
-    (_, matrix) => {
-      return `$$\\begin{bmatrix}${matrix}\\end{bmatrix}$$`;
-    }
-  );
-
-  content = content.replace(
-    /\\frac\{([^}]*)\}\{([^}]*)\}/g,
-    (_, a, b) => `$\\frac{${a}}{${b}}$`
-  );
-
-  content = content.replace(
-    /\\sqrt\{([^}]*)\}/g,
-    (_, a) => `$\\sqrt{${a}}$`
-  );
-
   return (
     <ReactMarkdown
       remarkPlugins={[remarkMath]}
