@@ -278,8 +278,94 @@ function DashboardStats() {
         </div>
 
       </div>
+
+      {/* ── Quick Actions + Study Tip ───────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+        {/* Quick Actions Panel */}
+        <div className="arc-card p-6 space-y-4">
+          <div>
+            <h3 className="arc-font-display text-base font-bold arc-text-gradient">⚡ Quick Actions</h3>
+            <p className="text-xs mt-0.5" style={{ color: "var(--arc-text-muted)" }}>Jump straight into your study session</p>
+          </div>
+          <div className="space-y-2.5">
+            {[
+              { icon: "📚", label: "Generate AI Notes", sub: "Pick a subject → topic → Actions", color: "rgba(99,102,241,0.12)", border: "rgba(99,102,241,0.25)" },
+              { icon: "🧠", label: "Create Mind Map",   sub: "Visual learning for any topic",   color: "rgba(168,85,247,0.12)", border: "rgba(168,85,247,0.25)" },
+              { icon: "📝", label: "Practice PYQs",     sub: "No API key needed — free forever", color: "rgba(16,185,129,0.10)", border: "rgba(16,185,129,0.25)" },
+              { icon: "⚡", label: "Quick Revision",    sub: "Flashcard-style rapid revision",    color: "rgba(245,158,11,0.10)", border: "rgba(245,158,11,0.25)" },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 cursor-default"
+                style={{ background: item.color, border: `1px solid ${item.border}` }}
+              >
+                <span className="text-lg shrink-0">{item.icon}</span>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-white truncate">{item.label}</p>
+                  <p className="text-xs truncate" style={{ color: "var(--arc-text-muted)" }}>{item.sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Daily Study Tip */}
+        <div className="arc-card p-6 space-y-4 flex flex-col">
+          <div>
+            <h3 className="arc-font-display text-base font-bold arc-text-gradient">💡 Daily Study Tip</h3>
+            <p className="text-xs mt-0.5" style={{ color: "var(--arc-text-muted)" }}>Science-backed techniques for peak performance</p>
+          </div>
+
+          <div className="flex-1 space-y-3">
+            {/* Show one tip based on day of week */}
+            {(() => {
+              const tips = [
+                { tip: "Active Recall", desc: "After reading a topic, close the material and try to recall key points. This strengthens memory 3x more than re-reading.", icon: "🔁" },
+                { tip: "Spaced Repetition", desc: "Review topics at increasing intervals: 1 day, 3 days, 7 days, 14 days. Nebula's revision packs help you do this automatically.", icon: "📅" },
+                { tip: "Pomodoro Technique", desc: "Study for 25 minutes, take a 5-minute break. After 4 cycles, take a 20-minute break. This keeps your focus sharp all day.", icon: "⏱️" },
+                { tip: "Feynman Method", desc: "Explain any concept as if teaching it to a 10-year-old. If you can't, that's where your gap is. Use AI Notes to fill it.", icon: "🧑‍🏫" },
+                { tip: "Interleaving Practice", desc: "Mix different subjects in a single session instead of studying one subject all day. This boosts long-term retention significantly.", icon: "🔀" },
+                { tip: "Sleep & Memory", desc: "Your brain consolidates memories during deep sleep. Studying just before sleeping and reviewing next morning is highly effective.", icon: "😴" },
+                { tip: "Eliminate Distractions", desc: "Put your phone face down and use app blockers. Even a notification glance breaks 23 minutes of focus. Nebula is distraction-free by design.", icon: "📵" },
+              ];
+              const tip = tips[new Date().getDay() % tips.length];
+              return (
+                <div className="rounded-2xl p-5 space-y-3" style={{ background: "rgba(212,175,55,0.05)", border: "1px solid rgba(212,175,55,0.15)" }}>
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{tip.icon}</span>
+                    <h4 className="font-black text-sm" style={{ color: "var(--arc-gold-400)" }}>{tip.tip}</h4>
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: "var(--arc-text-secondary)" }}>{tip.desc}</p>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Progress motivational bar */}
+          <div className="rounded-xl p-4 space-y-2" style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)" }}>
+            <div className="flex justify-between text-xs font-semibold">
+              <span style={{ color: "var(--arc-success)" }}>🏆 Your Progress Today</span>
+              <span style={{ color: "var(--arc-text-muted)" }}>{stats.completed} / {stats.plans} plans done</span>
+            </div>
+            <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>
+              <div
+                className="h-full rounded-full transition-all duration-700"
+                style={{
+                  width: `${stats.plans === 0 ? 0 : Math.round((stats.completed / stats.plans) * 100)}%`,
+                  background: "linear-gradient(to right, #10B981, #34D399)",
+                  boxShadow: "0 0 8px rgba(16,185,129,0.4)",
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   );
 }
 
 export default DashboardStats;
+
