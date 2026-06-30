@@ -102,7 +102,7 @@ const modelName =
       return res.status(503).json({ error: "The AI provider is experiencing high demand. Please try again later." });
     }
 
-    res.status(500).json({ error: "An error occurred while communicating with the AI provider." });
+    res.status(500).json({ error: `AI Error: ${err.message || "An error occurred while communicating with the AI provider."}` });
   } finally {
     // 4. Zero out key from memory
     // While V8 handles GC for primitive strings, overwriting the local reference helps.
