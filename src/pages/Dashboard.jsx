@@ -151,7 +151,7 @@ function Dashboard() {
       {/* ── Mobile overlay ───────────────────────────────────── */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[55] lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -161,7 +161,7 @@ function Dashboard() {
           ════════════════════════════════════════════════════════ */}
       <aside
         className={`
-          fixed lg:sticky top-0 left-0 h-screen z-40
+          fixed lg:sticky top-0 left-0 h-[100dvh] lg:h-screen z-[60] lg:z-40
           w-72 flex flex-col
           transition-transform duration-300 ease-in-out
           lg:translate-x-0
@@ -209,7 +209,7 @@ function Dashboard() {
         </nav>
 
         {/* Bottom section ─────────────────────────────────────── */}
-        <div className="px-4 py-5 space-y-2 border-t flex flex-col gap-1" style={{ borderColor: "var(--arc-border)" }}>
+        <div className="px-4 pt-5 pb-20 lg:pb-5 space-y-2 border-t flex flex-col gap-1" style={{ borderColor: "var(--arc-border)" }}>
           {/* Theme Toggle ─────────────────────────────────────── */}
           <button
             onClick={toggleDarkMode}
