@@ -74,9 +74,10 @@ const modelName =
     try {
       result = await model.generateContent(prompt);
     } catch (modelErr) {
-      if (modelErr.message && modelErr.message.includes("503") && modelName !== "gemini-1.5-flash") {
-        console.log("503 Service Unavailable: Falling back to gemini-1.5-flash...");
-        model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const errMsg = modelErr.message || "";
+      if (errMsg.includes("503") || errMsg.includes("is not found")) {
+        console.log(`Model ${modelName} failed (${errMsg}). Falling back to gemini-pro...`);
+        model = genAI.getGenerativeModel({ model: "gemini-pro" });
         result = await model.generateContent(prompt);
       } else {
         throw modelErr;
