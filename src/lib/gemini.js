@@ -1,7 +1,7 @@
 import supabase from "./supabase";
 import { getLanguageConfig } from "../config/languages";
 
-const BACKEND_URL = `${import.meta.env.VITE_API_URL}/api/ai`;
+const BACKEND_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/ai`;
 
 const parseGeminiError = (error) => {
   console.error("Gemini API error:", error);
@@ -78,7 +78,7 @@ const generateFromBackend = async (prompt) => {
     body: JSON.stringify({
       prompt: finalPrompt,
       provider: "gemini",
-      modelName: "gemini-2.5-flash"
+      modelName: "gemini-1.5-flash"
     })
   });
 
@@ -118,7 +118,7 @@ ${textToTranslate}
       body: JSON.stringify({
         prompt,
         provider: "gemini",
-        modelName: "gemini-2.5-flash"
+        modelName: "gemini-1.5-flash"
       })
     });
     

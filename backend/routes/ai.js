@@ -45,7 +45,7 @@ router.post("/generate", async (req, res) => {
 } = req.body;
 
 const modelName =
-  process.env.GEMINI_MODEL || "gemini-2.5-flash";
+  process.env.GEMINI_MODEL || "gemini-1.5-flash";
 
     if (!prompt) {
       return res.status(400).json({ error: "Prompt is required." });
@@ -74,7 +74,7 @@ const modelName =
     try {
       result = await model.generateContent(prompt);
     } catch (modelErr) {
-      if (modelErr.message && modelErr.message.includes("503") && modelName === "gemini-2.5-flash") {
+      if (modelErr.message && modelErr.message.includes("503") && modelName !== "gemini-1.5-flash") {
         console.log("503 Service Unavailable: Falling back to gemini-1.5-flash...");
         model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         result = await model.generateContent(prompt);

@@ -18,7 +18,7 @@ export default function Settings() {
   const [message, setMessage] = useState({ type: "", text: "" });
   const [langMessage, setLangMessage] = useState({ type: "", text: "" });
 
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   console.log("API_URL =", API_URL);
 
