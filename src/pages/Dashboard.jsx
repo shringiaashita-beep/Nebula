@@ -12,7 +12,6 @@ import ProgressPage from "./ProgressPage";
 import PYQPage from "./PYQPage";
 import SummaryPage from "./SummaryPage";
 import ErrorBoundary from "../components/ErrorBoundary";
-import SystemStatusBanner from "../components/SystemStatusBanner";
 
 // ── Sidebar navigation config ──────────────────────────────────
 const NAV_ITEMS = [
@@ -291,8 +290,6 @@ function Dashboard() {
         {/* pb-20 on mobile = space above bottom nav bar */}
         <main className="flex-1 p-3 sm:p-4 md:p-8 overflow-x-hidden pb-24 lg:pb-8">
           
-          <SystemStatusBanner />
-
           {showWelcomeBanner && (
             <div className="mb-6 p-4 rounded-xl border flex justify-between items-start animate-fade-in" 
                  style={{ 
