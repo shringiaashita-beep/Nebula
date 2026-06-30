@@ -15,6 +15,7 @@ function TopicNotes({
   subject,
   topic,
   onClose,
+  onTakeChallenge,
 }) {
   const { t } = useTranslation();
   const [notes, setNotes] = useState("");
@@ -227,6 +228,14 @@ function TopicNotes({
           )}
         </div>
         <div className="flex flex-wrap gap-2">
+          {onTakeChallenge && (
+            <button
+              onClick={onTakeChallenge}
+              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-4 py-2 text-xs rounded-lg shadow-lg active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
+            >
+              🚀 Take Challenge
+            </button>
+          )}
           {userLanguage !== "english" && !generated && (
             <button
               onClick={handleTranslate}
@@ -250,6 +259,29 @@ function TopicNotes({
           </button>
         </div>
       </div>
+
+      {onTakeChallenge && (
+        <div 
+          className="mb-6 p-5 rounded-2xl border flex flex-col sm:flex-row justify-between items-center gap-4 bg-gradient-to-r from-amber-500/10 to-purple-600/10 border-amber-500/30"
+          style={{
+            boxShadow: "0 4px 20px rgba(212,175,55,0.08)"
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🏆</span>
+            <div>
+              <h4 className="font-bold text-sm text-white">Ready for the Ultimate Test?</h4>
+              <p className="text-xs text-slate-400 mt-0.5">Attempt the 30 hardest AI-generated multiple choice questions for this topic.</p>
+            </div>
+          </div>
+          <button
+            onClick={onTakeChallenge}
+            className="arc-btn-gold px-5 py-2.5 text-xs rounded-xl font-bold flex items-center gap-1.5 shadow-lg active:scale-95 transition-transform cursor-pointer animate-pulse"
+          >
+            🚀 Take Challenge
+          </button>
+        </div>
+      )}
 
       {errorMsg && (
         <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-xs px-4 py-2.5 rounded-xl mb-4 flex justify-between items-center animate-fade-in">

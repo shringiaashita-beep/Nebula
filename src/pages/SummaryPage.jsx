@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 
 const STEPS = [
   {
@@ -104,13 +105,17 @@ const FAQS = [
     q: "Can I use Nebula without an API key?",
     a: "Yes! The PYQ Hub (Previous Year Questions) works 100% without any API key. You can practice thousands of questions for free without adding any key."
   },
+  {
+    q: "How can I contact the developer directly for help?",
+    a: "If you encounter any problems, have questions, or want to report a bug, please feel free to reach out directly to the developer at shringiaashita@gmail.com. We are happy to help!"
+  }
 ];
 
 function HelpChat() {
   const [messages, setMessages] = useState([
     {
       from: "bot",
-      text: "👋 Hi! I'm the Nebula Help Assistant. Ask me anything about how to copy your API key, how Nebula keeps it safe, or how to use any feature!"
+      text: "👋 Hi! I'm the Nebula Help Assistant. Ask me anything about how to copy your API key, how Nebula keeps it safe, or how to use any feature!\n\n✉️ Alternatively, if you suffer from any problem, you can contact the developer directly at shringiaashita@gmail.com."
     }
   ]);
   const [input, setInput] = useState("");
@@ -141,7 +146,10 @@ function HelpChat() {
     if (q.includes("login") || q.includes("sign up") || q.includes("register") || q.includes("account")) {
       return "👤 To create an account: go to the Nebula homepage → click 'Register' → fill in your details. It's completely free. After logging in, you'll have your own private dashboard!";
     }
-    return "🤔 I'm not sure about that specific question. Here are things I can help with:\n- How to copy your Gemini API key\n- Is my API key safe in Nebula?\n- How to generate notes/mind maps\n- Using PYQ Hub without an API key\n- How to change language\nTry asking one of these!";
+    if (q.includes("contact") || q.includes("support") || q.includes("email") || q.includes("developer") || q.includes("problem") || q.includes("suffer") || q.includes("bug") || q.includes("help")) {
+      return "✉️ You can contact the developer directly via email at shringiaashita@gmail.com for help, bug reports, or support. We will get back to you as soon as possible!";
+    }
+    return "🤔 I'm not sure about that specific question. Here are things I can help with:\n- How to copy your Gemini API key\n- Is my API key safe in Nebula?\n- How to generate notes/mind maps\n- Using PYQ Hub without an API key\n- How to change language\n- How to contact the developer\nTry asking one of these or email support directly at shringiaashita@gmail.com!";
   };
 
   const sendMessage = () => {
@@ -155,7 +163,7 @@ function HelpChat() {
   return (
     <div className="arc-card-elevated rounded-2xl overflow-hidden flex flex-col" style={{ height: "420px" }}>
       {/* Chat header */}
-      <div className="px-5 py-4 flex items-center gap-3 border-b" style={{ borderColor: "var(--arc-border)", background: "rgba(0,0,0,0.3)" }}>
+      <div className="px-5 py-4 flex items-center gap-3 border-b" style={{ borderColor: "var(--arc-border)", background: "var(--arc-bg-base)" }}>
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm">🤖</div>
         <div>
           <p className="font-bold text-sm" style={{ color: "var(--arc-text-hero)" }}>Nebula Help Assistant</p>
@@ -169,7 +177,7 @@ function HelpChat() {
             <div className={`max-w-[80%] text-xs leading-relaxed px-4 py-2.5 rounded-2xl whitespace-pre-wrap ${
               msg.from === "user"
                 ? "bg-blue-600 text-white rounded-br-sm"
-                : "bg-white/5 text-slate-200 border border-white/10 rounded-bl-sm"
+                : "help-bot-msg rounded-bl-sm"
             }`}>
               {msg.text}
             </div>
@@ -184,7 +192,7 @@ function HelpChat() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendMessage()}
           placeholder="Ask anything about the app or API key..."
-          className="flex-1 text-xs px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+          className="flex-1 text-xs px-4 py-2.5 rounded-xl help-chat-input placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
         />
         <button
           onClick={sendMessage}
@@ -363,20 +371,49 @@ function SummaryPage() {
       </div>
 
       {/* ─── HELP CHAT ─── */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div className="text-center space-y-2">
           <h2 className="text-2xl font-bold arc-font-display" style={{ color: "var(--arc-text-hero)" }}>
             💬 Still Need Help? Ask Here!
           </h2>
-          <p className="text-sm text-slate-400 max-w-xl mx-auto">
-            Can't figure something out? Chat with our built-in Help Assistant below — it can answer any question about using Nebula or setting up your API key!
+          <p className="text-sm text-slate-400 max-w-xl mx-auto leading-relaxed">
+            Can't figure something out? Chat with our built-in Help Assistant below, or contact the developer directly at{" "}
+            <a href="mailto:shringiaashita@gmail.com" className="text-amber-400 hover:text-amber-300 font-semibold underline transition-colors">
+              shringiaashita@gmail.com
+            </a>.
           </p>
         </div>
         <HelpChat />
+
+        {/* Direct Contact Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="help-contact-card mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 p-6 rounded-2xl border"
+          style={{ backdropFilter: "blur(8px)" }}
+        >
+          <div className="flex items-center gap-3 text-left w-full sm:w-auto">
+            <span className="text-3xl shrink-0">📨</span>
+            <div>
+              <h4 className="font-bold text-sm" style={{ color: "var(--arc-text-hero)" }}>Direct Developer Support</h4>
+              <p className="text-xs text-slate-400">If you suffer from any issues, bugs, or have feedback, please reach out directly.</p>
+            </div>
+          </div>
+          <a
+            href="mailto:shringiaashita@gmail.com"
+            className="arc-btn-gold px-6 py-2.5 text-xs flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto whitespace-nowrap"
+            style={{ minWidth: "150px" }}
+          >
+            <span>Email Me Directly</span>
+            <span>✉️</span>
+          </a>
+        </motion.div>
       </div>
 
       {/* ─── WHY USEFUL ─── */}
-      <div className="p-8 rounded-3xl border shadow-lg" style={{ background: "rgba(212, 175, 55, 0.05)", borderColor: "rgba(212,175,55,0.2)" }}>
+      <div className="help-why-useful-card p-8 rounded-3xl border shadow-lg">
         <h2 className="text-2xl font-bold arc-font-display mb-6" style={{ color: "var(--arc-text-hero)" }}>
           💡 Why is Nebula Useful for You?
         </h2>
@@ -390,7 +427,7 @@ function SummaryPage() {
             <li key={item.title} className="flex gap-4 items-start">
               <span className="text-2xl mt-1 flex-shrink-0">{item.icon}</span>
               <p className="text-sm md:text-base leading-relaxed text-slate-200">
-                <strong className="text-white">{item.title}:</strong> {item.body}
+                <strong style={{ color: "var(--arc-text-hero)" }}>{item.title}:</strong> {item.body}
               </p>
             </li>
           ))}

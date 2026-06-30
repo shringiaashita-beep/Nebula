@@ -29,7 +29,6 @@ const [topics, setTopics] = useState([]);
 const [openMenu, setOpenMenu] =
   useState(null);
 const [bulkGenerating, setBulkGenerating] = useState(false);
-const [questionGeneratingTopicId, setQuestionGeneratingTopicId] = useState(null);
 const [selectedTopic, setSelectedTopic] = useState(null);
 const [editingTopic, setEditingTopic] = useState(null);
 const [editText, setEditText] = useState("");
@@ -390,113 +389,7 @@ const generateNotesForAllTopics =
     );
   };
 
-const generateHardQuestionsForTopic =
-  async (topicItem) => {
-    const subject = topicItem.subject_name;
-    const topicText = topicItem.topic_name;
 
-    const { data: existingQuestions, error: existingError } =
-      await supabase
-        .from("question_bank")
-        .select("question")
-        .eq("subject_name", subject)
-        .eq("topic_name", topicText);
-
-    if (existingError) {
-      console.error(existingError);
-      alert("Could not check existing questions.");
-      return;
-    }
-
-    const existingSet = new Set(
-      (existingQuestions || []).map((item) =>
-        item.question.trim().toLowerCase()
-      )
-    );
-
-    if (existingQuestions?.length >= 30) {
-      alert("This topic already has 30 or more questions.");
-      return;
-    }
-
-    const requiredCount =
-      30 - (existingQuestions?.length || 0);
-
-    setQuestionGeneratingTopicId(topicItem.id);
-
-    let generatedQuestions = [];
-    try {
-      generatedQuestions = await generateHardQuestions(
-        subject,
-        topicText,
-        requiredCount
-      );
-    } catch (error) {
-      alert(
-        error.message ||
-          "AI quota exceeded or failed to generate questions. Please try again later."
-      );
-      setQuestionGeneratingTopicId(null);
-      return;
-    }
-
-    if (!Array.isArray(generatedQuestions)) {
-      alert("AI returned invalid question data. Try again.");
-      setQuestionGeneratingTopicId(null);
-      return;
-    }
-
-    const rows = generatedQuestions
-      .map((item) => ({
-        subject_name: subject,
-        topic_name: topicText,
-        question: item.question?.trim(),
-        option_a: item.option_a?.trim(),
-        option_b: item.option_b?.trim(),
-        option_c: item.option_c?.trim(),
-        option_d: item.option_d?.trim(),
-        correct_answer: item.correct_answer?.trim(),
-      }))
-      .filter(
-        (item) =>
-          item.question &&
-          item.option_a &&
-          item.option_b &&
-          item.option_c &&
-          item.option_d &&
-          item.correct_answer &&
-          !existingSet.has(
-            item.question.toLowerCase()
-          )
-      )
-      .slice(0, requiredCount);
-
-    if (rows.length === 0) {
-      alert("No new valid questions were generated.");
-      setQuestionGeneratingTopicId(null);
-      return;
-    }
-
-    const { error: insertError } =
-      await supabase
-        .from("question_bank")
-        .insert(rows);
-
-    setQuestionGeneratingTopicId(null);
-
-    if (insertError) {
-      console.error(insertError);
-      alert("Failed to save generated questions.");
-      return;
-    }
-
-    alert(
-      `${rows.length} hard question(s) generated for this topic. ` +
-        `Total questions: ${
-          (existingQuestions?.length || 0) + rows.length
-        }`
-    );
-  };
 const completeTopic = async (
 topicId,
 isCompleted
@@ -660,11 +553,6 @@ fetchTopics();
                   <span className="text-xs font-semibold" style={{ color: topic.is_completed ? "var(--arc-success)" : "var(--arc-gold-400)" }}>
                     {topic.is_completed ? "🏆 Completed" : "📖 In Progress"}
                   </span>
-                  {questionGeneratingTopicId === topic.id && (
-                    <span className="text-xs animate-pulse" style={{ color: "var(--arc-gold-400)" }}>
-                      ⚡ Generating questions...
-                    </span>
-                  )}
                 </div>
               </div>
 
@@ -693,7 +581,6 @@ fetchTopics();
                         { label: "📖 View Notes", action: () => setNotesTopic(topic) },
                         { label: "🧠 Mind Map", action: () => setMindMapTopic(topic) },
                         { label: "⚡ Quick Revision", action: () => setRevisionTopic(topic) },
-                        { label: "🎯 Generate 30 Hard Questions", action: () => generateHardQuestionsForTopic(topic) },
                       ].map((item) => (
                         <button
                           key={item.label}
@@ -739,7 +626,15 @@ fetchTopics();
             {/* Child Components if open */}
             <div className="mt-4">
               {notesTopic?.id === topic.id && (
-                <TopicNotes subject={topic.subject_name} topic={topic.topic_name} onClose={() => setNotesTopic(null)} />
+                <TopicNotes
+                  subject={topic.subject_name}
+                  topic={topic.topic_name}
+                  onClose={() => setNotesTopic(null)}
+                  onTakeChallenge={() => {
+                    setNotesTopic(null);
+                    setSelectedTopic(topic);
+                  }}
+                />
               )}
               {flashcardTopic?.id === topic.id && (
                 <Flashcards subject={topic.subject_name} topic={topic.topic_name} onClose={() => setFlashcardTopic(null)} />
@@ -759,6 +654,7 @@ fetchTopics();
         <EliteChallenge
           subject={selectedTopic.subject_name}
           topic={selectedTopic.topic_name}
+          onClose={() => setSelectedTopic(null)}
           onPass={async () => {
             const {
               data: { user },
