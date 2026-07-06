@@ -10,17 +10,11 @@ function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const [showTerms, setShowTerms] = useState(false);
-  const [agreeTerms, setAgreeTerms] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
       setErrorMsg("Please fill in all fields.");
-      return;
-    }
-    if (!agreeTerms) {
-      setErrorMsg("You must agree to the Terms & Conditions to sign in.");
       return;
     }
 
@@ -139,41 +133,18 @@ function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
-              className="arc-input"
-            />
-          </div>
+            className="arc-input"
+          />
+        </div>
 
-          {/* Terms Agreement Checkbox */}
-          <div className="flex items-start gap-2 pt-1 text-xs">
-            <input
-              id="login-terms"
-              type="checkbox"
-              checked={agreeTerms}
-              onChange={(e) => setAgreeTerms(e.target.checked)}
-              disabled={loading}
-              className="mt-0.5 rounded cursor-pointer accent-amber-500"
-              required
-            />
-            <label htmlFor="login-terms" style={{ color: "var(--arc-text-secondary)" }} className="cursor-pointer select-none">
-              I agree to the{" "}
-              <button
-                type="button"
-                onClick={() => setShowTerms(true)}
-                className="underline font-bold text-amber-500 hover:text-amber-400 cursor-pointer bg-transparent border-none p-0 inline"
-              >
-                Terms & Conditions / नियम और शर्तें
-              </button>
-            </label>
-          </div>
-
-          <button
-            type="submit"
-            id="login-submit"
-            disabled={loading}
-            className="arc-btn-gold w-full py-3.5 text-sm"
-          >
-            {loading ? t("Errors.Loading...") : t("Auth.Login")}
-          </button>
+        <button
+          type="submit"
+          id="login-submit"
+          disabled={loading}
+          className="arc-btn-gold w-full py-3.5 text-sm"
+        >
+          {loading ? t("Errors.Loading...") : t("Auth.Login")}
+        </button>
         </form>
 
         {/* Register link */}
@@ -190,53 +161,6 @@ function Login() {
           </Link>
         </p>
       </div>
-
-      {/* ── Terms & Conditions Modal ── */}
-      {showTerms && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-          <div
-            className="w-full max-w-lg rounded-2xl p-6 overflow-hidden flex flex-col max-h-[85vh] border"
-            style={{
-              background: "var(--arc-bg-surface)",
-              borderColor: "var(--arc-border-gold)",
-              boxShadow: "0 24px 80px rgba(0,0,0,0.8), 0 0 32px var(--arc-gold-glow-lg)"
-            }}
-          >
-            <div className="flex justify-between items-center pb-3 border-b" style={{ borderColor: "var(--arc-border)" }}>
-              <h3 className="arc-font-display text-base font-bold arc-text-gold">
-                📜 Terms & Conditions / नियम और शर्तें
-              </h3>
-              <button
-                onClick={() => setShowTerms(false)}
-                className="text-xs arc-btn-ghost px-2.5 py-1 rounded-lg"
-              >
-                ✕ Close
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto my-4 pr-1 text-xs space-y-3 text-justify leading-relaxed" style={{ color: "var(--arc-text-secondary)" }}>
-              <p className="font-bold text-white">1. Platform Services / प्लेटफॉर्म सेवाएं</p>
-              <p>Nebula Study Command Center provides AI tutoring, historical competitive examination questions (PYQs), study planner generators, and progress telemetry. By accessing or initializing a command node, you agree to comply with all guidelines.</p>
-              
-              <p className="font-bold text-white">2. Study Telemetry & Privacy / डेटा और गोपनीयता</p>
-              <p>Your practice logs, streaks, and generated notes are private to you unless public options are explicitly enabled. All user data is processed securely through Supabase databases. We prioritize student credential confidentiality.</p>
-
-              <p className="font-bold text-white">3. Acceptable Use / उचित उपयोग</p>
-              <p>You agree not to bypass quiz security, reverse engineer question scrapers, or flood the API channels. Generative AI outputs are meant strictly for self-learning and examination prep assistance.</p>
-              
-              <p className="font-bold text-white">4. Telemetry Disclaimer / अस्वीकरण</p>
-              <p>Examination questions are retrieved directly from official past paper repositories. While Nebula strives for correctness in mock grading, you are advised to verify answers against official state board answer keys.</p>
-            </div>
-            <div className="pt-3 border-t flex justify-end" style={{ borderColor: "var(--arc-border)" }}>
-              <button
-                onClick={() => setShowTerms(false)}
-                className="arc-btn-gold text-xs px-5 py-2 rounded-xl"
-              >
-                I Understand / मैं समझता हूँ
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
