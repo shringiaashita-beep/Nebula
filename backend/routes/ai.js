@@ -8,6 +8,46 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 // Apply auth middleware to all routes
 router.use(authenticateUser);
 
+// Deprecated model name → replacement
+const DEPRECATED_MODELS = {
+  "gemini-pro":        "gemini-1.5-flash",
+  "gemini-pro-vision": "gemini-1.5-flash",
+  "gemini-ultra":      "gemini-1.5-pro",
+};
+
+// Ordered list of models to try (primary + fallbacks)
+const MODEL_CHAIN = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash", "gemini-1.0-pro"];
+
+/**
+ * Classify a raw Gemini SDK error into a clean HTTP response.
+ */
+function classifyGeminiError(err, res) {
+  const raw = (err?.message || err?.toString() || "").toLowerCase();
+  console.error("[AI] Raw error:", err?.message || err);
+
+  if (raw.includes("api key not valid") || raw.includes("api_key_invalid") || raw.includes("invalid api key") || raw.includes("api key expired")) {
+    return res.status(401).json({ error: "Your API key is invalid or expired. Please update it in Settings." });
+  }
+  if (raw.includes("quota") || raw.includes("resource_exhausted") || raw.includes("429") || raw.includes("rate limit")) {
+    return res.status(429).json({ error: "AI quota limit reached. Please wait a few minutes and try again." });
+  }
+  if (raw.includes("service_disabled") || raw.includes("not been used in project") || raw.includes("api has not been used") || raw.includes("403")) {
+    return res.status(403).json({ error: "The Gemini API is not enabled for your API key. Please enable it at console.developers.google.com or use an API key from aistudio.google.com." });
+  }
+  if (raw.includes("503") || raw.includes("overloaded") || raw.includes("unavailable")) {
+    return res.status(503).json({ error: "AI service is overloaded. Please try again in a moment." });
+  }
+  if (raw.includes("404") || raw.includes("is not found") || raw.includes("not supported") || raw.includes("deprecated")) {
+    return res.status(503).json({ error: "AI model unavailable. Please try again." });
+  }
+  if (raw.includes("network") || raw.includes("fetch") || raw.includes("econnrefused") || raw.includes("etimedout")) {
+    return res.status(503).json({ error: "Network error reaching AI service. Please try again." });
+  }
+
+  // Generic safe fallback
+  return res.status(500).json({ error: "Something went wrong with the AI request. Please try again." });
+}
+
 /**
  * Helper to fetch and decrypt the user's API key.
  */
@@ -33,27 +73,62 @@ async function getDecryptedApiKey(userId, authHeader, provider = "gemini") {
 }
 
 /**
+ * Try generating content with a given API key across the model chain.
+ * Returns { text } on success, throws the last error on full failure.
+ */
+async function tryGenerateWithKey(apiKey, prompt) {
+  const requested = process.env.GEMINI_MODEL || "gemini-1.5-flash";
+  const primary = DEPRECATED_MODELS[requested] || requested;
+
+  // Build model chain: primary first, then remaining fallbacks (skip duplicates)
+  const chain = [primary, ...MODEL_CHAIN.filter(m => m !== primary)];
+
+  let lastErr = null;
+  for (const modelName of chain) {
+    try {
+      console.log(`[AI] Trying model: ${modelName}`);
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: modelName });
+      const result = await model.generateContent(prompt);
+      const text = result.response.text();
+      console.log(`[AI] Success with model: ${modelName}`);
+      return text;
+    } catch (err) {
+      console.error(`[AI] Model ${modelName} failed:`, err.message);
+      lastErr = err;
+
+      // If it's a key/auth/quota/API-disabled error, stop immediately — no point trying other models
+      const msg = (err?.message || "").toLowerCase();
+      const isKeyError =
+        msg.includes("api key not valid") ||
+        msg.includes("api_key_invalid") ||
+        msg.includes("invalid api key") ||
+        msg.includes("quota") ||
+        msg.includes("resource_exhausted") ||
+        msg.includes("403") ||
+        msg.includes("service_disabled") ||
+        msg.includes("not been used in project") ||
+        msg.includes("401");
+
+      if (isKeyError) {
+        console.log(`[AI] Key/auth error detected, stopping fallback chain.`);
+        throw err; // Surface immediately to classifyGeminiError
+      }
+      // Otherwise (503, 404, network) — continue to next model
+    }
+  }
+
+  throw lastErr;
+}
+
+/**
  * POST /api/ai/generate
  * Proxies the AI generation request securely.
  */
 router.post("/generate", async (req, res) => {
   let apiKey = null;
   try {
-   const {
-  prompt,
-  provider = "gemini",
-} = req.body;
-
-const modelName = (() => {
-  const requested = process.env.GEMINI_MODEL || "gemini-1.5-flash";
-  // Auto-upgrade deprecated / removed model names
-  const DEPRECATED = {
-    "gemini-pro":        "gemini-1.5-flash",
-    "gemini-pro-vision": "gemini-1.5-flash",
-    "gemini-ultra":      "gemini-1.5-pro",
-  };
-  return DEPRECATED[requested] ?? requested;
-})();
+    const { prompt, provider = "gemini" } = req.body;
 
     if (!prompt) {
       return res.status(400).json({ error: "Prompt is required." });
@@ -63,92 +138,23 @@ const modelName = (() => {
       return res.status(400).json({ error: "Only Gemini is supported currently." });
     }
 
-    // 1. Fetch & Decrypt Key
+    // 1. Fetch & Decrypt user's API key
     try {
       apiKey = await getDecryptedApiKey(req.user.id, req.headers.authorization, provider);
     } catch (err) {
       if (err.message === "API_KEY_NOT_FOUND") {
-        return res.status(404).json({ error: "No API key configured. Please add one in Settings." });
+        return res.status(404).json({ error: "No API key configured. Please go to Settings and add your Gemini API key." });
       }
       return res.status(500).json({ error: "Failed to decrypt API key." });
     }
 
-    // 2. Initialize Gemini Client
-    const genAI = new GoogleGenerativeAI(apiKey);
-    let model = genAI.getGenerativeModel({ model: modelName });
-
-    // 3. Generate Content with Fallback
-    // Fallback chain: primary model → gemini-1.5-pro → gemini-1.0-pro
-    const FALLBACK_MODELS = ["gemini-1.5-pro", "gemini-1.0-pro"];
-    let result;
-    try {
-      result = await model.generateContent(prompt);
-    } catch (modelErr) {
-      const errMsg = modelErr.message || "";
-      const isModelUnavailable =
-        errMsg.includes("503") ||
-        errMsg.includes("404") ||
-        errMsg.includes("is not found") ||
-        errMsg.includes("not supported") ||
-        errMsg.includes("deprecated");
-
-      if (isModelUnavailable) {
-        let fallbackSuccess = false;
-        for (const fallbackModel of FALLBACK_MODELS) {
-          try {
-            console.log(`Model ${modelName} failed. Trying fallback: ${fallbackModel}...`);
-            model = genAI.getGenerativeModel({ model: fallbackModel });
-            result = await model.generateContent(prompt);
-            fallbackSuccess = true;
-            break;
-          } catch (fallbackErr) {
-            console.error(`Fallback ${fallbackModel} also failed:`, fallbackErr.message);
-          }
-        }
-        if (!fallbackSuccess) {
-          throw new Error("All AI models are currently unavailable. Please try again later.");
-        }
-      } else {
-        throw modelErr;
-      }
-    }
-    
-    const text = result.response.text();
-
+    // 2. Generate with full model chain fallback
+    const text = await tryGenerateWithKey(apiKey, prompt);
     res.json({ text });
+
   } catch (err) {
-    console.error("AI Proxy Error:", err);
-    const msg = err.message || "";
-
-    if (msg.toLowerCase().includes("quota") || msg.includes("RESOURCE_EXHAUSTED") || msg.includes("429")) {
-      return res.status(429).json({ error: "AI quota exceeded. Please wait a few minutes and try again." });
-    }
-
-    if (msg.toLowerCase().includes("all ai models are currently unavailable")) {
-      return res.status(503).json({ error: "All AI models are currently unavailable. Please try again in a few minutes." });
-    }
-
-    if (msg.includes("API key not valid") || msg.includes("API_KEY_INVALID") || msg.includes("401")) {
-      return res.status(401).json({ error: "Invalid API key. Please check your API key in Settings." });
-    }
-
-    if (msg.includes("503") || msg.includes("overloaded")) {
-      return res.status(503).json({ error: "The AI provider is experiencing high demand. Please try again later." });
-    }
-
-    if (msg.includes("403") || msg.includes("SERVICE_DISABLED") || msg.includes("not been used in project")) {
-      return res.status(403).json({ error: "The AI service is not enabled for this API key. Please check your Google Cloud project settings." });
-    }
-
-    if (msg.includes("404") || msg.includes("is not found") || msg.includes("not supported")) {
-      return res.status(503).json({ error: "AI model unavailable. Please try again later." });
-    }
-
-    // Generic fallback — never leak raw error messages to the client
-    res.status(500).json({ error: "Something went wrong with the AI request. Please try again." });
+    return classifyGeminiError(err, res);
   } finally {
-    // 4. Zero out key from memory
-    // While V8 handles GC for primitive strings, overwriting the local reference helps.
     apiKey = null;
   }
 });
