@@ -44,8 +44,16 @@ router.post("/generate", async (req, res) => {
   provider = "gemini",
 } = req.body;
 
-const modelName =
-  process.env.GEMINI_MODEL || "gemini-1.5-flash";
+const modelName = (() => {
+  const requested = process.env.GEMINI_MODEL || "gemini-1.5-flash";
+  // Auto-upgrade deprecated / removed model names
+  const DEPRECATED = {
+    "gemini-pro":        "gemini-1.5-flash",
+    "gemini-pro-vision": "gemini-1.5-flash",
+    "gemini-ultra":      "gemini-1.5-pro",
+  };
+  return DEPRECATED[requested] ?? requested;
+})();
 
     if (!prompt) {
       return res.status(400).json({ error: "Prompt is required." });
@@ -114,6 +122,10 @@ const modelName =
 
     if (msg.toLowerCase().includes("quota") || msg.includes("RESOURCE_EXHAUSTED") || msg.includes("429")) {
       return res.status(429).json({ error: "AI quota exceeded. Please wait a few minutes and try again." });
+    }
+
+    if (msg.toLowerCase().includes("all ai models are currently unavailable")) {
+      return res.status(503).json({ error: "All AI models are currently unavailable. Please try again in a few minutes." });
     }
 
     if (msg.includes("API key not valid") || msg.includes("API_KEY_INVALID") || msg.includes("401")) {
