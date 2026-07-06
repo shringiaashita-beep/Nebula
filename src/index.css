@@ -1,9 +1,25 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════
-   ARCLIGHT DESIGN SYSTEM — GLOBAL TOKEN SET
-   Nebula AI Study Platform — Premium Obsidian + Gold Theme
+   SCREENSHOT & CONTENT PROTECTION
+   Prevents selection, right-click save, and mobile long-press
    ═══════════════════════════════════════════════════════════════ */
+*, *::before, *::after {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none; /* iOS — disables long-press "Save Image" menu */
+}
+
+/* Allow text selection only inside inputs and textareas */
+input, textarea, [contenteditable="true"] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+
+
 :root {
   /* ── Base Background Layers ── */
   --arc-bg-base:         #090A0F;

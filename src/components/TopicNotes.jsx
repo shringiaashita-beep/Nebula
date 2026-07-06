@@ -31,10 +31,12 @@ function TopicNotes({
   const [answer, setAnswer] = useState("");
   const [asking, setAsking] = useState(false);
   const [aiError, setAiError] = useState(null);
+  const [aiErrorType, setAiErrorType] = useState(null); // "api_key" | "quota" | "generic"
   const [errorMsg, setErrorMsg] = useState(null);
 
   useEffect(() => {
     setAiError(null);
+    setAiErrorType(null);
     setTranslatedNotes(null);
     setShowingTranslation(false);
     fetchNotes();
@@ -77,6 +79,11 @@ function TopicNotes({
       await generateAndStoreNotes(data?.id);
     } catch (err) {
       console.error("fetchNotes error:", err);
+      // Surface DB/session errors to the user instead of silently failing
+      const msg = err?.message || "";
+      if (!msg.includes("generateAndStoreNotes")) {
+        setAiError(err.message || "Failed to load notes. Please try again.");
+      }
       setLoading(false);
     }
   };
@@ -105,7 +112,21 @@ function TopicNotes({
       }
     } catch (error) {
       console.error("generateAndStoreNotes error:", error);
-      setAiError(error.message || "Failed to generate notes.");
+      const msg = error.message || "Failed to generate notes.";
+      setAiError(msg);
+      // Determine error type for smart CTA
+      if (
+        msg.toLowerCase().includes("api key") ||
+        msg.toLowerCase().includes("settings") ||
+        msg.toLowerCase().includes("invalid") ||
+        msg.toLowerCase().includes("not enabled")
+      ) {
+        setAiErrorType("api_key");
+      } else if (msg.toLowerCase().includes("quota") || msg.toLowerCase().includes("limit")) {
+        setAiErrorType("quota");
+      } else {
+        setAiErrorType("generic");
+      }
     } finally {
       setLoading(false);
     }
@@ -168,20 +189,52 @@ function TopicNotes({
   }
 
   if (aiError) {
+    const isApiKeyIssue = aiErrorType === "api_key";
+    const isQuotaIssue = aiErrorType === "quota";
     return (
-      <div className="bg-red-50 border border-red-200 p-4 rounded-lg mt-4">
-        <h3 className="font-semibold text-red-700 mb-2">
-          Unable to generate notes
-        </h3>
-        <p className="text-sm text-red-600 mb-3">
-          {aiError}
-        </p>
-        <button
-          onClick={generateAndStoreNotes}
-          className="bg-red-600 text-white px-4 py-2 rounded-lg"
+      <div
+        className="border p-6 rounded-2xl mt-4 flex flex-col items-center text-center gap-4"
+        style={{
+          background: "var(--arc-bg-surface)",
+          borderColor: "rgba(239,68,68,0.3)",
+          boxShadow: "0 4px 32px rgba(239,68,68,0.08)"
+        }}
+      >
+        <div
+          className="w-16 h-16 rounded-full flex items-center justify-center text-3xl"
+          style={{ background: "rgba(239,68,68,0.12)" }}
         >
-          Retry
-        </button>
+          {isApiKeyIssue ? "🔑" : isQuotaIssue ? "⏳" : "⚠️"}
+        </div>
+        <div>
+          <h3 className="font-bold text-lg text-white mb-1">
+            {isApiKeyIssue ? "API Key Issue" : isQuotaIssue ? "Quota Limit Reached" : "AI Unavailable"}
+          </h3>
+          <p className="text-sm text-slate-400 max-w-sm leading-relaxed">
+            {aiError}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2 justify-center">
+          <button
+            onClick={() => { setAiError(null); setAiErrorType(null); generateAndStoreNotes(); }}
+            className="arc-btn-gold px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 active:scale-95 transition-transform"
+          >
+            🔄 Try Again
+          </button>
+          {isApiKeyIssue && (
+            <a
+              href="/settings"
+              className="px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 border transition-all active:scale-95"
+              style={{
+                borderColor: "var(--arc-border-gold)",
+                color: "var(--arc-gold-300)",
+                background: "var(--arc-gold-glow)"
+              }}
+            >
+              ⚙️ Go to Settings
+            </a>
+          )}
+        </div>
       </div>
     );
   }

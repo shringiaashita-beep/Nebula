@@ -3,9 +3,115 @@ import { getLanguageConfig } from "../config/languages";
 
 const BACKEND_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/ai`;
 
+/**
+ * Converts any raw Gemini/backend error into a clean, user-friendly message.
+ * Never leaks API URLs, JSON blobs, or technical error codes to the UI.
+ */
 const parseGeminiError = (error) => {
   console.error("Gemini API error:", error);
-  return error;
+
+  const raw = error?.message || "";
+
+  // Strip technical noise before pattern matching
+  const msg = raw
+    .replace(/\[GoogleGenerativeAI Error\]/gi, "")
+    .replace(/https?:\/\/\S+/g, "")
+    .replace(/\[{[\s\S]*?}\]/g, "")
+    .toLowerCase();
+
+  // No API key configured by user
+  if (
+    raw.includes("API_KEY_NOT_FOUND") ||
+    raw.toLowerCase().includes("no api key configured") ||
+    raw.toLowerCase().includes("please add one in settings")
+  ) {
+    return new Error(
+      "No API key set up. Please go to Settings and add your Gemini API key to use AI features."
+    );
+  }
+
+  // 403 – API not enabled / project disabled
+  if (
+    msg.includes("403") ||
+    msg.includes("service_disabled") ||
+    msg.includes("not been used in project") ||
+    msg.includes("forbidden") ||
+    msg.includes("not enabled")
+  ) {
+    return new Error(
+      "The Gemini API is not enabled for your API key. Please enable it in your Google Cloud Console, then try again."
+    );
+  }
+
+  // 404 – model deprecated / not found
+  if (
+    msg.includes("404") ||
+    msg.includes("is not found") ||
+    msg.includes("not supported for generatecontent") ||
+    msg.includes("deprecated") ||
+    msg.includes("model unavailable")
+  ) {
+    return new Error(
+      "The AI model is temporarily unavailable. Please try again in a moment."
+    );
+  }
+
+  // 429 – quota / rate limit
+  if (
+    msg.includes("429") ||
+    msg.includes("quota") ||
+    msg.includes("resource_exhausted") ||
+    msg.includes("rate limit")
+  ) {
+    return new Error(
+      "AI quota limit reached. Please wait a few minutes and try again."
+    );
+  }
+
+  // 401 – invalid key / unauthenticated
+  if (
+    msg.includes("401") ||
+    msg.includes("api_key_invalid") ||
+    msg.includes("unauthenticated") ||
+    msg.includes("invalid api key") ||
+    msg.includes("api key not valid")
+  ) {
+    return new Error(
+      "Your API key is invalid. Please go to Settings and check your Gemini API key."
+    );
+  }
+
+  // Network failures
+  if (
+    msg.includes("failed to fetch") ||
+    msg.includes("networkerror") ||
+    msg.includes("load failed") ||
+    msg.includes("network request failed")
+  ) {
+    return new Error(
+      "Network error. Please check your internet connection and try again."
+    );
+  }
+
+  // All AI models unavailable (our custom backend message)
+  if (msg.includes("all ai models are currently unavailable")) {
+    return new Error(
+      "All AI models are currently unavailable. Please try again in a few minutes."
+    );
+  }
+
+  // Generic fallback – aggressively strip all technical noise
+  const clean = raw
+    .replace(/\[GoogleGenerativeAI Error\]/gi, "")
+    .replace(/Error fetching from[\s\S]*?:/g, "")
+    .replace(/https?:\/\/\S+/g, "")
+    .replace(/\[{[\s\S]*?}\]/g, "")
+    .replace(/AI Error:\s*/gi, "")
+    .replace(/\[\d+\s+\w+\]/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+
+  return new Error(clean || "Something went wrong with AI. Please try again.");
 };
 
 const parseJsonResponse = (text) => {
@@ -28,7 +134,7 @@ const parseJsonResponse = (text) => {
 
       if (start !== -1 && end !== -1 && end > start) {
         let jsonText = cleaned.slice(start, end + 1);
-        jsonText = jsonText.replace(/\\(?!["\\/bfnrtu])/g, "\\\\");
+        jsonText = jsonText.replace(/\\(?!["\\\/bfnrtu])/g, "\\\\");
         return JSON.parse(jsonText);
       }
     } catch (secondError) {

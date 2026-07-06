@@ -70,15 +70,36 @@ const modelName =
     let model = genAI.getGenerativeModel({ model: modelName });
 
     // 3. Generate Content with Fallback
+    // Fallback chain: primary model → gemini-1.5-pro → gemini-1.0-pro
+    const FALLBACK_MODELS = ["gemini-1.5-pro", "gemini-1.0-pro"];
     let result;
     try {
       result = await model.generateContent(prompt);
     } catch (modelErr) {
       const errMsg = modelErr.message || "";
-      if (errMsg.includes("503") || errMsg.includes("is not found")) {
-        console.log(`Model ${modelName} failed (${errMsg}). Falling back to gemini-pro...`);
-        model = genAI.getGenerativeModel({ model: "gemini-pro" });
-        result = await model.generateContent(prompt);
+      const isModelUnavailable =
+        errMsg.includes("503") ||
+        errMsg.includes("404") ||
+        errMsg.includes("is not found") ||
+        errMsg.includes("not supported") ||
+        errMsg.includes("deprecated");
+
+      if (isModelUnavailable) {
+        let fallbackSuccess = false;
+        for (const fallbackModel of FALLBACK_MODELS) {
+          try {
+            console.log(`Model ${modelName} failed. Trying fallback: ${fallbackModel}...`);
+            model = genAI.getGenerativeModel({ model: fallbackModel });
+            result = await model.generateContent(prompt);
+            fallbackSuccess = true;
+            break;
+          } catch (fallbackErr) {
+            console.error(`Fallback ${fallbackModel} also failed:`, fallbackErr.message);
+          }
+        }
+        if (!fallbackSuccess) {
+          throw new Error("All AI models are currently unavailable. Please try again later.");
+        }
       } else {
         throw modelErr;
       }
@@ -89,21 +110,30 @@ const modelName =
     res.json({ text });
   } catch (err) {
     console.error("AI Proxy Error:", err);
-    
-    // Attempt to safely parse Gemini errors to avoid leaking full error stack
-    if (err.message && err.message.toLowerCase().includes("quota")) {
-      return res.status(429).json({ error: "AI quota exceeded. Please wait or check your plan." });
-    }
-    
-    if (err.message && err.message.includes("API key not valid")) {
-      return res.status(401).json({ error: "Invalid API key provided." });
+    const msg = err.message || "";
+
+    if (msg.toLowerCase().includes("quota") || msg.includes("RESOURCE_EXHAUSTED") || msg.includes("429")) {
+      return res.status(429).json({ error: "AI quota exceeded. Please wait a few minutes and try again." });
     }
 
-    if (err.message && err.message.includes("503")) {
+    if (msg.includes("API key not valid") || msg.includes("API_KEY_INVALID") || msg.includes("401")) {
+      return res.status(401).json({ error: "Invalid API key. Please check your API key in Settings." });
+    }
+
+    if (msg.includes("503") || msg.includes("overloaded")) {
       return res.status(503).json({ error: "The AI provider is experiencing high demand. Please try again later." });
     }
 
-    res.status(500).json({ error: `AI Error: ${err.message || "An error occurred while communicating with the AI provider."}` });
+    if (msg.includes("403") || msg.includes("SERVICE_DISABLED") || msg.includes("not been used in project")) {
+      return res.status(403).json({ error: "The AI service is not enabled for this API key. Please check your Google Cloud project settings." });
+    }
+
+    if (msg.includes("404") || msg.includes("is not found") || msg.includes("not supported")) {
+      return res.status(503).json({ error: "AI model unavailable. Please try again later." });
+    }
+
+    // Generic fallback — never leak raw error messages to the client
+    res.status(500).json({ error: "Something went wrong with the AI request. Please try again." });
   } finally {
     // 4. Zero out key from memory
     // While V8 handles GC for primitive strings, overwriting the local reference helps.
